@@ -28,7 +28,7 @@ dependencies {
 
 uploadArchives {
     repositories.mavenDeployer {
-        configuration = configurations.deployerJars
+        configuration = configurations.deployer
         repository(url: "scp://maven.reening.nl/media/maven/") {
             authentication(userName: mavenUsername, password: mavenPassword)
         }
