@@ -12,6 +12,8 @@ repositories {
 
 group = 'jk_5.nailed.gradle'
 version = '1.0'
+targetCompatibility = '1.6'
+sourceCompatibility = '1.6'
 
 configurations{
     deployer
