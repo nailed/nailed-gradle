@@ -82,7 +82,7 @@ public class DeployLauncherProfileTask extends DefaultTask {
 
         JsonObject newRoot = new JsonObject();
         newRoot.addProperty("id", ext.getVersionName());
-        newRoot.addProperty("mainClass", ext.getVersionName());
+        newRoot.addProperty("mainClass", ext.getMainClass());
         newRoot.addProperty("minimumLauncherVersion", remoteInfo.get("minimumLauncherVersion").getAsInt());
         newRoot.addProperty("type", "release");
         newRoot.addProperty("processArguments", "username_session_version");
