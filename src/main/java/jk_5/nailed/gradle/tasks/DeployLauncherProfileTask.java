@@ -30,12 +30,11 @@ public class DeployLauncherProfileTask extends DefaultTask {
         this.onlyIf(new Closure<Boolean>(this, this){
             @Override
             public Boolean call(Object... objects) {
-                return true;
-                /*LauncherExtension ext = LauncherExtension.getInstance(DeployLauncherProfileTask.this.getProject());
+                LauncherExtension ext = LauncherExtension.getInstance(DeployLauncherProfileTask.this.getProject());
                 String host = ext.getDeployHost();
                 String username = ext.getDeployUsername();
                 String password = ext.getDeployPassword();
-                return !(Strings.isNullOrEmpty(host) || Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password));*/
+                return !(Strings.isNullOrEmpty(host) || Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password));
             }
         });
     }
@@ -97,7 +96,7 @@ public class DeployLauncherProfileTask extends DefaultTask {
         tempFile.getParentFile().mkdirs();
         if(tempFile.exists()) tempFile.delete();
         Writer writer = new PrintWriter(tempFile);
-        writer.write(gson.toJson(newArray));
+        writer.write(gson.toJson(newRoot));
         writer.close();
 
         String host = ext.getDeployHost();
