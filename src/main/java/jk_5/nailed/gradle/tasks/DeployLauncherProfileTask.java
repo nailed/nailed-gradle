@@ -1,5 +1,6 @@
 package jk_5.nailed.gradle.tasks;
 
+import com.google.common.base.Strings;
 import com.google.gson.*;
 import com.jcraft.jsch.*;
 import groovy.lang.Closure;
