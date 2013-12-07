@@ -1,6 +1,5 @@
 package jk_5.nailed.gradle.tasks;
 
-import com.google.common.base.Strings;
 import com.google.gson.*;
 import com.jcraft.jsch.*;
 import groovy.lang.Closure;
@@ -31,11 +30,12 @@ public class DeployLauncherProfileTask extends DefaultTask {
         this.onlyIf(new Closure<Boolean>(this, this){
             @Override
             public Boolean call(Object... objects) {
-                LauncherExtension ext = LauncherExtension.getInstance(DeployLauncherProfileTask.this.getProject());
+                return true;
+                /*LauncherExtension ext = LauncherExtension.getInstance(DeployLauncherProfileTask.this.getProject());
                 String host = ext.getDeployHost();
                 String username = ext.getDeployUsername();
                 String password = ext.getDeployPassword();
-                return !(Strings.isNullOrEmpty(host) || Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password));
+                return !(Strings.isNullOrEmpty(host) || Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password));*/
             }
         });
     }
