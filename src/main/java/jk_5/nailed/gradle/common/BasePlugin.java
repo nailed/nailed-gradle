@@ -31,7 +31,7 @@ public abstract class BasePlugin implements Plugin<Project> {
         this.addMavenRepo("reening", "http://maven.reening.nl");
         this.addMavenRepo("forge", "http://files.minecraftforge.net/maven");
         this.project.getRepositories().mavenCentral();
-        this.addMavenRepo("minecraft", "http://s3.amazonaws.com/Minecraft.Download/libraries");
+        this.addMavenRepo("minecraft", "https://libraries.minecraft.net");
         this.addIvyRepo("forgeLegacy", "http://files.minecraftforge.net/[module]/[module]-dev-[revision].[ext]");
 
         project.afterEvaluate(new Action<Project>() {

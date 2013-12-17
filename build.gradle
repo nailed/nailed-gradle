@@ -12,8 +12,8 @@ repositories {
 
 group = 'jk_5.nailed.gradle'
 version = '1.1-SNAPSHOT'
-targetCompatibility = '1.7'
-sourceCompatibility = '1.7'
+targetCompatibility = '1.6'
+sourceCompatibility = '1.6'
 
 configurations{
     deployer
@@ -32,10 +32,13 @@ dependencies {
 }
 
 uploadArchives {
-    repositories.mavenDeployer {
-        configuration = configurations.deployer
-        repository(url: "scp://maven.reening.nl/media/maven/") {
-            authentication(userName: mavenUsername, password: mavenPassword)
+    if (project.hasProperty("filesmaven")) {
+        logger.info('Deploying to file server')
+        repositories.mavenDeployer {
+            configuration = configurations.deployer
+            repository(url: "scp://maven.reening.nl/media/maven/") {
+                authentication(userName: project.filesmaven.mavenUsername, password: project.filesmaven.mavenPassword)
+            }
         }
     }
 }
