@@ -5,13 +5,15 @@ import com.google.gson.*;
 import com.jcraft.jsch.*;
 import groovy.lang.Closure;
 import jk_5.nailed.gradle.Constants;
-import jk_5.nailed.gradle.delayed.DelayedFile;
 import jk_5.nailed.gradle.delayed.DelayedString;
-import jk_5.nailed.gradle.extension.LauncherExtension;
+import jk_5.nailed.gradle.extension.NailedExtension;
+import org.apache.tools.ant.filters.StringInputStream;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
@@ -31,7 +33,7 @@ public class DeployLauncherProfileTask extends DefaultTask {
         this.onlyIf(new Closure<Boolean>(this, this){
             @Override
             public Boolean call(Object... objects) {
-                LauncherExtension ext = LauncherExtension.getInstance(DeployLauncherProfileTask.this.getProject());
+                NailedExtension ext = NailedExtension.getInstance(DeployLauncherProfileTask.this.getProject());
                 String host = ext.getDeployHost();
                 String username = ext.getDeployUsername();
                 String password = ext.getDeployPassword();
@@ -42,7 +44,7 @@ public class DeployLauncherProfileTask extends DefaultTask {
 
     @TaskAction
     public void doTask() throws IOException, JSchException, SftpException {
-        LauncherExtension ext = LauncherExtension.getInstance(this.getProject());
+        NailedExtension ext = NailedExtension.getInstance(this.getProject());
         URL url = new URL(new DelayedString(this.getProject(), Constants.FML_JSON_URL).call());
         URLConnection conn = url.openConnection();
         conn.setConnectTimeout(5000);
@@ -52,7 +54,7 @@ public class DeployLauncherProfileTask extends DefaultTask {
         JsonObject remoteInfo = parsed.getAsJsonObject().getAsJsonObject("versionInfo");
         JsonArray libs = remoteInfo.getAsJsonArray("libraries");
         JsonArray newArray = new JsonArray();
-        for(JsonObject dep : ext.getLoadingDependencies()){
+        for(JsonObject dep : ext.getLauncherDependencies()){
             if(dep.has("url") && dep.get("url").getAsString().equals("{MAVEN_URL}")){
                 dep.remove("url");
                 dep.addProperty("url", ext.getLoadingMavenUrl());
@@ -74,7 +76,7 @@ public class DeployLauncherProfileTask extends DefaultTask {
         reader.close();
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        StringBuilder argsBuilder = new StringBuilder("--username ${auth_player_name} --session ${auth_session} --version ${version_name} --gameDir ${game_directory} --assetsDir ${game_assets}");
+        StringBuilder argsBuilder = new StringBuilder("--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userProperties ${user_properties} --userType ${user_type}");
         for(String string : ext.getTweakers()){
             argsBuilder.append(" --tweakClass ");
             argsBuilder.append(string);
@@ -93,12 +95,7 @@ public class DeployLauncherProfileTask extends DefaultTask {
         newRoot.add("libraries", newArray);
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        File tempFile = new DelayedFile(this.getProject(), "{CACHE_DIR}/profile.json").call();
-        tempFile.getParentFile().mkdirs();
-        if(tempFile.exists()) tempFile.delete();
-        Writer writer = new PrintWriter(tempFile);
-        writer.write(gson.toJson(newRoot));
-        writer.close();
+        String profileContent = gson.toJson(newRoot);
 
         String host = ext.getDeployHost();
         String username = ext.getDeployUsername();
@@ -114,10 +111,19 @@ public class DeployLauncherProfileTask extends DefaultTask {
         Channel channel = session.openChannel("sftp");
         channel.connect();
         ChannelSftp sftp = (ChannelSftp) channel;
-        sftp.cd(ext.getRemoteProfileDir());
-        sftp.put(new FileInputStream(tempFile), "launcherProfile.json");
+        String[] folders = ext.getRemoteProfileDir().split("/");
+        for(String folder : folders){
+            if(folder.length() > 0){
+                try{
+                    sftp.cd(folder);
+                }catch(SftpException e){
+                    sftp.mkdir(folder);
+                    sftp.cd(folder);
+                }
+            }
+        }
+        sftp.put(new StringInputStream(profileContent), "launcherProfile.json");
         sftp.exit();
         session.disconnect();
-        tempFile.delete();
     }
 }

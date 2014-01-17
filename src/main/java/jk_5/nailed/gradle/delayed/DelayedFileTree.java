@@ -1,6 +1,6 @@
 package jk_5.nailed.gradle.delayed;
 
-import net.minecraftforge.gradle.ZipFileTree;
+import jk_5.nailed.gradle.common.ZipFileTree;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.internal.file.collections.FileTreeAdapter;

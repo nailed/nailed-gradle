@@ -1,8 +1,7 @@
 package jk_5.nailed.gradle.delayed;
 
 import groovy.lang.Closure;
-import net.minecraftforge.gradle.common.BaseExtension;
-import net.minecraftforge.gradle.common.Constants;
+import jk_5.nailed.gradle.extension.NailedExtension;
 import org.gradle.api.Project;
 
 /**
@@ -54,16 +53,16 @@ public abstract class DelayedBase<V> extends Closure<V> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static String resolve(String patern, Project project, IDelayedResolver... resolvers) {
         project.getLogger().info("Resolving: " + patern);
-        BaseExtension minecraftExtension = (BaseExtension) project.getExtensions().getByName(Constants.EXT_NAME_MC);
 
         String build = "0";
         if (System.getenv().containsKey("BUILD_NUMBER")) {
             build = System.getenv("BUILD_NUMBER");
         }
 
-        String mcVersion = minecraftExtension.getVersion().split("-")[0];
+        NailedExtension ext = NailedExtension.getInstance(project);
 
-        patern = patern.replace("{MC_VERSION}", mcVersion);
+        patern = patern.replace("{MC_VERSION}", ext.getMinecraftVersion());
+        patern = patern.replace("{FORGE_VERSION}", ext.getForgeVersion());
         patern = patern.replace("{CACHE_DIR}", project.getGradle().getGradleUserHomeDir().getAbsolutePath().replace('\\', '/') + "/caches/nailed-forge");
         patern = patern.replace("{BUILD_DIR}", project.getBuildDir().getAbsolutePath().replace('\\', '/'));
         patern = patern.replace("{BUILD_NUM}", build);

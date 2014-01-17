@@ -5,8 +5,16 @@ apply plugin: 'maven'
 repositories {
     mavenCentral()
     maven {
+        name = 'reening'
+        url = 'http://maven.reening.nl'
+    }
+    maven {
         name 'forge'
         url 'http://files.minecraftforge.net/maven'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
     }
 }
 
@@ -25,20 +33,23 @@ dependencies {
     compile 'org.projectlombok:lombok:1.12.2'
     compile 'com.google.guava:guava:14.0'
     compile 'com.google.code.gson:gson:2.2.4'
-    compile 'net.minecraftforge.gradle:ForgeGradle:1.0-SNAPSHOT'
     compile 'com.jcraft:jsch:0.1.50'
 
     deployer 'org.apache.maven.wagon:wagon-ssh:2.2'
 }
 
 uploadArchives {
-    if (project.hasProperty("filesmaven")) {
+    if (project.hasProperty("deploymaven") && false) {
         logger.info('Deploying to file server')
         repositories.mavenDeployer {
             configuration = configurations.deployer
-            repository(url: "scp://maven.reening.nl/media/maven/") {
-                authentication(userName: project.filesmaven.mavenUsername, password: project.filesmaven.mavenPassword)
+            repository(url: project.deploymaven.url) {
+                authentication(userName: project.deploymaven.username, password: project.deploymaven.password)
             }
+        }
+    }else{
+        repositories{
+            mavenLocal()
         }
     }
 }
