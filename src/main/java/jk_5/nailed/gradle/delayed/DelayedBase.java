@@ -67,6 +67,11 @@ public abstract class DelayedBase<V> extends Closure<V> {
         patern = patern.replace("{BUILD_DIR}", project.getBuildDir().getAbsolutePath().replace('\\', '/'));
         patern = patern.replace("{BUILD_NUM}", build);
         patern = patern.replace("{PROJECT}", project.getName());
+        patern = patern.replace("{VERSION}", project.getVersion().toString());
+        patern = patern.replace("{GROUP_ID}", project.getGroup().toString());
+        patern = patern.replace("{GROUP_DIR}", project.getGroup().toString().replace('.', '/'));
+        patern = patern.replace("{REMOTE_DATA_DIR}", ext.getRemoteProfileDir());
+        patern = patern.replace("{MAVEN_URL}", ext.getLoadingMavenUrl());
 
         for (IDelayedResolver r : resolvers) {
             patern = r.resolve(patern, project);

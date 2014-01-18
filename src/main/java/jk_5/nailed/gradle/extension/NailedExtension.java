@@ -1,12 +1,12 @@
 package jk_5.nailed.gradle.extension;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonObject;
+import jk_5.nailed.gradle.delayed.DelayedString;
+import jk_5.nailed.gradle.tasks.CreateLauncherProfileTask;
 import lombok.Getter;
 import lombok.Setter;
 import org.gradle.api.Project;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,18 +31,26 @@ public class NailedExtension {
     @Getter @Setter private String deployUsername = null;
     @Getter @Setter private String deployPassword = null;
     @Getter @Setter private String remoteProfileDir = "";
+    @Getter @Setter private String ircServer = "";
+    @Getter @Setter private int ircPort = 6667;
+    @Getter @Setter private String ircChannel = "";
     @Getter private List<String> tweakers = Lists.newArrayList();
-    @Getter private List<JsonObject> launcherDependencies = Lists.newArrayList();
+    @Getter private List<Project> deployedProjects = Lists.newArrayList();
 
-    public void setLauncherDependency(String launcherDependency){
-        JsonObject obj = new JsonObject();
-        obj.addProperty("name", launcherDependency);
-        obj.addProperty("url", "{MAVEN_URL}");
-        launcherDependencies.add(obj);
+    public void setLauncherDependency(String dep){
+        ((CreateLauncherProfileTask) this.project.getTasks().getByName("createLauncherProfile")).addDependency(new DelayedString(this.project, dep));
     }
 
-    public void setTweakers(String... tweakers){
-        this.tweakers = Arrays.asList(tweakers);
+    public void setDeployedArtifact(String artifact){
+        for(Project p : this.project.getSubprojects()){
+            if(p.getName().equals(artifact)){
+                this.deployedProjects.add(p);
+            }
+        }
+    }
+
+    public void setTweaker(String tweaker){
+        this.tweakers.add(tweaker);
     }
 
     public NailedExtension(Project project){
