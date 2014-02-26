@@ -16,8 +16,8 @@ import java.io.IOException;
  */
 public class DeploySubprojectTask extends UploadTask {
 
-    @Setter
-    private Project subProject;
+    @Setter private Project subProject;
+    @Setter private String destLocation;
 
     @Override
     public void doTask() throws IOException, JSchException, SftpException, InterruptedException{
@@ -28,9 +28,8 @@ public class DeploySubprojectTask extends UploadTask {
         this.setRemoteDir(this.delayedString(groupDir + "/Nailed-" + name + "/" + version));
         this.setRemoteFile(this.delayedString("Nailed-" + name + "-" + version + ".jar"));
         this.setUploadFile(this.delayedFile("{BUILD_DIR}/libs/Nailed-" + name + "-" + version + ".jar"));
-        this.setDestination(this.delayedString("{MC_LIB_DIR}/" + groupDir + "/Nailed-" + name + "/" + version + "/Nailed-" + name + "-" + version + ".jar"));
+        this.setDestination(this.delayedString(this.destLocation.replace("{GROUP}", groupDir).replace("{NAME}", name).replace("{VERSION}", version)));
         this.setArtifact(this.delayedString("nailed" + name));
-        this.setRestart("game");
 
         super.doTask();
     }

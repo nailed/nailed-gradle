@@ -27,6 +27,11 @@ public class Constants {
     public static final String FORGE_CACHE = "{CACHE_DIR}/{MC_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}.jar";
     public static final String CLIENT_LOCATION = "{BUILD_DIR}/libs/Nailed-Client-{CLIENT_VERSION}.jar";
     public static final String PROFILE_LOCATION = "{CACHE_DIR}/{MC_VERSION}/launcherProfile.json";
+    public static final String DEPFILE_LOCATION = "{CACHE_DIR}/{MC_VERSION}/remoteDepFile.json";
+
+    public static final String CONFIG_DEPS = "nailedDeps";
+    public static final String JSON_LOCATION = "jsons/{MC_VERSION}.json";
+    public static final String MINECRAFT_MAVEN_URL = "https://libraries.minecraft.net";
 
     public static String hash(File file){
         return hash(file, "MD5");

@@ -2,12 +2,9 @@ package jk_5.nailed.gradle.tasks;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.GsonBuilder;
 import com.jcraft.jsch.*;
 import groovy.lang.Closure;
-import jk_5.asyncirc.Conversation;
-import jk_5.asyncirc.IrcConnection;
 import jk_5.nailed.gradle.Constants;
 import jk_5.nailed.gradle.delayed.DelayedFile;
 import jk_5.nailed.gradle.delayed.DelayedString;
@@ -37,6 +34,7 @@ public class UploadTask extends DefaultTask {
     @Getter @Setter private DelayedString destination;
     @Getter @Setter private DelayedString artifact;
     @Getter @Setter private String restart = "no";
+    private static final Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 
     public UploadTask() {
         super();
@@ -83,6 +81,7 @@ public class UploadTask extends DefaultTask {
             }
         }
         String checksum = Constants.getSHA1(this.getUploadFile().call());
+        boolean uploadFile = true;
         try{
             BufferedReader reader = new BufferedReader(new InputStreamReader(sftp.get(this.remoteFile.call() + ".sha1")));
             String remote = reader.readLine();
@@ -90,20 +89,23 @@ public class UploadTask extends DefaultTask {
             if(checksum.equals(remote) && System.getProperty("forceUpdate", "false").equals("false")){
                 //Checksums match, don't update
                 this.getLogger().lifecycle("Local checksum matched remote checksum. Not updating!");
-                sftp.exit();
-                channel.disconnect();
-                return;
+                uploadFile = false;
+                //sftp.exit();
+                //channel.disconnect();
+                //return;
             }
         }catch(Exception e){
             //Go ahead, remote checksum not found
         }
 
-        sftp.put(new FileInputStream(this.getUploadFile().call()), this.remoteFile.call());
-        sftp.put(new StringInputStream(checksum), this.remoteFile.call() + ".sha1");
+        if(uploadFile){
+            sftp.put(new FileInputStream(this.getUploadFile().call()), this.remoteFile.call());
+            sftp.put(new StringInputStream(checksum), this.remoteFile.call() + ".sha1");
+        }
 
         sftp.cd(sftp.getHome());
         sftp.cd(ext.getRemoteProfileDir());
-        JsonObject versionData;
+        /*JsonObject versionData;
         try{
             versionData = new JsonParser().parse(new InputStreamReader(sftp.get("versions.json"))).getAsJsonObject();
         }catch(Exception e){
@@ -134,14 +136,15 @@ public class UploadTask extends DefaultTask {
         fileInfo.addProperty("destination", this.destination.call());
         fileInfo.addProperty("location", this.remoteDir.call() + "/" + this.remoteFile.call());
         if(!this.restart.equals("no")) fileInfo.addProperty("restart", this.restart);
-        sftp.put(new StringInputStream(new Gson().toJson(versionData)), "versions.json");
+        sftp.put(new StringInputStream(prettyGson.toJson(versionData)), "versions.json");
         sftp.exit();
-        session.disconnect();
+        session.disconnect();*/
 
-        IrcConnection connection = new IrcConnection(ext.getIrcServer(), ext.getIrcPort()).setName("nailed-updater").connect().sync();
+        /*IrcConnection connection = new IrcConnection(ext.getIrcServer(), ext.getIrcPort()).setName("nailed-updater").connect().sync();
         Conversation conv = connection.joinChannel(ext.getIrcChannel()).syncUninterruptibly().conversation();
         conv.sendMessage("UPDATE|" + this.artifact + "|" + revision).sync();
-        Thread.sleep(1000);
-        conv.leaveChannel().close();
+        connection.close();*/
+        sftp.exit();
+        session.disconnect();
     }
 }
