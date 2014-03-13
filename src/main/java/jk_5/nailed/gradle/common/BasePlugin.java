@@ -28,7 +28,7 @@ public abstract class BasePlugin implements Plugin<Project> {
     public final void apply(Project project) {
         this.project = project;
 
-        this.project.subprojects(new Action<Project>() {
+        this.project.allprojects(new Action<Project>() {
             @Override
             public void execute(Project project){
                 addMavenRepo(project, "reening", "http://maven.reening.nl");
