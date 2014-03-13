@@ -3,10 +3,7 @@ package jk_5.nailed.gradle;
 import jk_5.nailed.gradle.common.BasePlugin;
 import jk_5.nailed.gradle.delayed.DelayedBase;
 import jk_5.nailed.gradle.extension.NailedExtension;
-import jk_5.nailed.gradle.tasks.CreateLauncherProfileTask;
-import jk_5.nailed.gradle.tasks.DeploySubprojectTask;
-import jk_5.nailed.gradle.tasks.DownloadTask;
-import jk_5.nailed.gradle.tasks.UploadTask;
+import jk_5.nailed.gradle.tasks.*;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 
@@ -17,6 +14,8 @@ import org.gradle.api.Project;
  */
 public class NailedPlugin extends BasePlugin implements DelayedBase.IDelayedResolver {
 
+    private CreateLauncherProfileTask launcherProfileTask;
+
     @Override
     public void applyPlugin() {
         this.getProject().getExtensions().create(Constants.NAILED_EXTENSION, NailedExtension.class, this.getProject());
@@ -25,7 +24,7 @@ public class NailedPlugin extends BasePlugin implements DelayedBase.IDelayedReso
     }
 
     public void registerTasks(){
-        CreateLauncherProfileTask launcherProfileTask = this.makeTask("createLauncherProfile", CreateLauncherProfileTask.class);
+        launcherProfileTask = this.makeTask("createLauncherProfile", CreateLauncherProfileTask.class);
         launcherProfileTask.setDestination(this.delayedFile(Constants.PROFILE_LOCATION));
         launcherProfileTask.setFmlJson(this.delayedString(Constants.FML_JSON_URL));
 
@@ -78,6 +77,13 @@ public class NailedPlugin extends BasePlugin implements DelayedBase.IDelayedReso
             task.setSubProject(p);
             task.dependsOn("build");
             this.getProject().getTasks().getByName("deploy").dependsOn("deploy" + p.getName());
+        }
+
+        for(String l : NailedExtension.getInstance(this.getProject()).getAdditionalLibs()){
+            UpdateAdditionalLibraryTask task = this.makeTask("update" + l.split(":")[1], UpdateAdditionalLibraryTask.class);
+            task.setMavenPath(this.delayedString(l));
+            //task.setDestination(this.delayedString());
+            this.launcherProfileTask.addDependency(this.delayedString(l));
         }
     }
 

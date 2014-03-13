@@ -33,6 +33,7 @@ public class NailedExtension {
     @Getter @Setter private String remoteProfileDir = "";
     @Getter private List<String> tweakers = Lists.newArrayList();
     @Getter private List<Project> deployedProjects = Lists.newArrayList();
+    @Getter private List<String> additionalLibs = Lists.newArrayList();
 
     public void setLauncherDependency(String dep){
         ((CreateLauncherProfileTask) this.project.getTasks().getByName("createLauncherProfile")).addDependency(new DelayedString(this.project, dep));
@@ -44,6 +45,10 @@ public class NailedExtension {
                 this.deployedProjects.add(p);
             }
         }
+    }
+
+    public void setAdditionalLib(String additionalLib){
+        this.additionalLibs.add(additionalLib);
     }
 
     public void setTweaker(String tweaker){
