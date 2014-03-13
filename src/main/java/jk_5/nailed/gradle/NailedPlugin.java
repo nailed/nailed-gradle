@@ -66,24 +66,6 @@ public class NailedPlugin extends BasePlugin implements DelayedBase.IDelayedReso
         deployForgeTask.dependsOn("downloadForge");
         launcherProfileTask.addDependency(this.delayedString("jk_5.nailed.deploy:forge:{FORGE_VERSION}"));
 
-        /*UploadTask deployClientTask = this.makeTask("deployClient", UploadTask.class);
-        deployClientTask.setRemoteDir(this.delayedString("{GROUP_DIR}/Nailed-Client/{CLIENT_VERSION}"));
-        deployClientTask.setRemoteFile(this.delayedString("Nailed-Client-{CLIENT_VERSION}.jar"));
-        deployClientTask.setUploadFile(this.delayedFile(Constants.CLIENT_LOCATION));
-        deployClientTask.setDestination(this.delayedString("{MC_LIB_DIR}/{GROUP_DIR}/Nailed-Client/{CLIENT_VERSION}/Nailed-Client-{CLIENT_VERSION}.jar"));
-        deployClientTask.setArtifact(this.delayedString("nailedClient"));
-        deployClientTask.setRestart("game");
-        deployClientTask.dependsOn("build");
-
-        UploadTask deployUpdaterTask = this.makeTask("deployUpdater", UploadTask.class);
-        deployUpdaterTask.setRemoteDir(this.delayedString("{GROUP_DIR}/Nailed-Updater/{UPDATER_VERSION}"));
-        deployUpdaterTask.setRemoteFile(this.delayedString("Nailed-Client-{UPDATER_VERSION}.jar"));
-        deployUpdaterTask.setUploadFile(this.delayedFile(Constants.CLIENT_LOCATION));
-        deployUpdaterTask.setDestination(this.delayedString("{MC_LIB_DIR}/{GROUP_DIR}/Nailed-Updater/{UPDATER_VERSION}/Nailed-Updater-{UPDATER_VERSION}.jar"));
-        deployUpdaterTask.setArtifact(this.delayedString("updater"));
-        deployUpdaterTask.setRestart("game");
-        deployUpdaterTask.dependsOn("build");*/
-
         this.makeTask("deploy", DefaultTask.class).dependsOn("deployLauncherProfile", "deployMinecraft", "deployForge");
     }
 

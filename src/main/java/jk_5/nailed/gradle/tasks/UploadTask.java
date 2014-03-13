@@ -6,8 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jcraft.jsch.*;
 import groovy.lang.Closure;
-import jk_5.asyncirc.Conversation;
-import jk_5.asyncirc.IrcConnection;
 import jk_5.nailed.gradle.Constants;
 import jk_5.nailed.gradle.delayed.DelayedFile;
 import jk_5.nailed.gradle.delayed.DelayedString;
@@ -137,11 +135,5 @@ public class UploadTask extends DefaultTask {
         sftp.put(new StringInputStream(new Gson().toJson(versionData)), "versions.json");
         sftp.exit();
         session.disconnect();
-
-        IrcConnection connection = new IrcConnection(ext.getIrcServer(), ext.getIrcPort()).setName("nailed-updater").connect().sync();
-        Conversation conv = connection.joinChannel(ext.getIrcChannel()).syncUninterruptibly().conversation();
-        conv.sendMessage("UPDATE|" + this.artifact + "|" + revision).sync();
-        Thread.sleep(1000);
-        conv.leaveChannel().close();
     }
 }

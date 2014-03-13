@@ -35,8 +35,6 @@ dependencies {
     compile 'com.google.guava:guava:14.0'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.jcraft:jsch:0.1.50'
-    compile 'io.netty:netty-all:4.0.10.Final'
-    compile 'jk_5.asyncirc:ASyncIRCClient:0.1-SNAPSHOT'
 
     deployer 'org.apache.maven.wagon:wagon-ssh:2.2'
 }
