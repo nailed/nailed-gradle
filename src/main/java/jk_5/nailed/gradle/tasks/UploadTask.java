@@ -111,14 +111,12 @@ public class UploadTask extends DefaultTask {
             versionData.add(this.artifact.call(), new JsonObject());
         }
         JsonObject fileInfo = versionData.getAsJsonObject(this.artifact.call());
-        int revision = 0;
         if(!fileInfo.has("rev")){
             fileInfo.addProperty("rev", 0);
         }else{
             int rev = fileInfo.get("rev").getAsInt() + 1;
             fileInfo.remove("rev");
             fileInfo.addProperty("rev", rev);
-            revision = rev;
         }
         if(fileInfo.has("destination")){
             fileInfo.remove("destination");

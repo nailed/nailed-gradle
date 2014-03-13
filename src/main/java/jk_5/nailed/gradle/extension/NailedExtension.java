@@ -31,9 +31,6 @@ public class NailedExtension {
     @Getter @Setter private String deployUsername = null;
     @Getter @Setter private String deployPassword = null;
     @Getter @Setter private String remoteProfileDir = "";
-    @Getter @Setter private String ircServer = "";
-    @Getter @Setter private int ircPort = 6667;
-    @Getter @Setter private String ircChannel = "";
     @Getter private List<String> tweakers = Lists.newArrayList();
     @Getter private List<Project> deployedProjects = Lists.newArrayList();
 
