@@ -36,19 +36,56 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.jcraft:jsch:0.1.50'
 
-    deployer 'org.apache.maven.wagon:wagon-ssh:2.2'
+    deployer 'org.apache.maven.wagon:wagon-ssh:2.6'
+}
+
+artifacts {
+    archives jar
 }
 
 uploadArchives {
     if (project.hasProperty("deploymaven")) {
-        logger.info('Deploying to file server')
+        logger.lifecycle('Deploying to file server')
         repositories.mavenDeployer {
             configuration = configurations.deployer
             repository(url: project.deploymaven.url) {
                 authentication(userName: project.deploymaven.username, password: project.deploymaven.password)
             }
+            pom {
+                groupId = project.group
+                version = project.version
+                artifactId = project.archivesBaseName
+                project {
+                    name = project.archivesBaseName
+                    packaging = 'jar'
+                    description = 'Gradle plugin for Nailed'
+                    url = 'https://github.com/nailed/nailed-gradle'
+
+                    scm {
+                        url 'https://github.com/nailed/nailed-gradle'
+                        connection 'scm:git:git://github.com/nailed/nailed-gradle.git'
+                        developerConnection 'scm:git:git@github.com:nailed/nailed-gradle.git'
+                    }
+
+                    issueManagement {
+                        system 'github'
+                        url 'https://github.com/nailed/nailed-gradle/issues'
+                    }
+
+                    developers {
+                        developer {
+                            id = 'jk-5'
+                            name = 'jk-5'
+                            roles {
+                                role 'developer'
+                            }
+                        }
+                    }
+                }
+            }
         }
     }else{
+        logger.lifecycle('Deploying to mavenLocal')
         repositories{
             mavenLocal()
         }
