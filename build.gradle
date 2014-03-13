@@ -42,7 +42,7 @@ dependencies {
 }
 
 uploadArchives {
-    if (project.hasProperty("deploymaven") && false) {
+    if (project.hasProperty("deploymaven")) {
         logger.info('Deploying to file server')
         repositories.mavenDeployer {
             configuration = configurations.deployer

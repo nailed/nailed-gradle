@@ -28,11 +28,16 @@ public abstract class BasePlugin implements Plugin<Project> {
     public final void apply(Project project) {
         this.project = project;
 
-        this.addMavenRepo("reening", "http://maven.reening.nl");
-        this.addMavenRepo("forge", "http://files.minecraftforge.net/maven");
-        this.project.getRepositories().mavenCentral();
-        this.addMavenRepo("minecraft", "https://libraries.minecraft.net");
-        this.addIvyRepo("forgeLegacy", "http://files.minecraftforge.net/[module]/[module]-dev-[revision].[ext]");
+        this.project.subprojects(new Action<Project>() {
+            @Override
+            public void execute(Project project){
+                addMavenRepo(project, "reening", "http://maven.reening.nl");
+                addMavenRepo(project, "forge", "http://files.minecraftforge.net/maven");
+                project.getRepositories().mavenCentral();
+                addMavenRepo(project, "minecraft", "https://libraries.minecraft.net");
+                addIvyRepo(project, "forgeLegacy", "http://files.minecraftforge.net/[module]/[module]-dev-[revision].[ext]");
+            }
+        });
 
         project.afterEvaluate(new Action<Project>() {
             @Override
@@ -47,7 +52,7 @@ public abstract class BasePlugin implements Plugin<Project> {
     public void afterEvaluate(){}
     public abstract void applyPlugin();
 
-    public final void addMavenRepo(final String name, final String url){
+    public static void addMavenRepo(Project project, final String name, final String url){
         project.getRepositories().maven(new Action<MavenArtifactRepository>() {
             @Override
             public void execute(MavenArtifactRepository repo){
@@ -57,20 +62,14 @@ public abstract class BasePlugin implements Plugin<Project> {
         });
     }
 
-    public final void addIvyRepo(final String name, final String pattern){
+    public static void addIvyRepo(Project project, final String name, final String pattern){
         project.getRepositories().ivy(new Action<IvyArtifactRepository>() {
             @Override
-            public void execute(IvyArtifactRepository repo) {
+            public void execute(IvyArtifactRepository repo){
                 repo.setName(name);
                 repo.artifactPattern(pattern);
             }
         });
-    }
-
-    public void applyExternalPlugin(String plugin){
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("plugin", plugin);
-        this.project.apply(map);
     }
 
     @SuppressWarnings("unchecked")
