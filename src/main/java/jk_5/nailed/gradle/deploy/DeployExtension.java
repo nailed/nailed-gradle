@@ -21,6 +21,9 @@ public class DeployExtension {
      * Type can be "maven", "remote"
      */
     @Getter @Setter private String type;
+    @Getter @Setter private String url = null;
+    @Getter @Setter private String artifact = null;
+    @Getter @Setter private String version = null;
 
     public DeployExtension(Project project){
         this.project = project;

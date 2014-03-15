@@ -44,7 +44,7 @@ artifacts {
 }
 
 uploadArchives {
-    if (project.hasProperty("deploymaven")) {
+    if (project.hasProperty("deploymaven") && false) {
         logger.lifecycle('Deploying to file server')
         repositories.mavenDeployer {
             configuration = configurations.deployer

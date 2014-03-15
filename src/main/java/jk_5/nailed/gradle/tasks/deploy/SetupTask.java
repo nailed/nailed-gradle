@@ -1,12 +1,12 @@
 package jk_5.nailed.gradle.tasks.deploy;
 
-import org.gradle.api.DefaultTask;
+import jk_5.nailed.gradle.deploy.DeployTask;
 
 /**
  * No description given
  *
  * @author jk-5
  */
-public abstract class SetupTask extends DefaultTask {
+public abstract class SetupTask extends DeployTask {
 
 }

@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
 import jk_5.nailed.gradle.common.BasePlugin;
 import jk_5.nailed.gradle.tasks.deploy.SetupMavenTask;
 import jk_5.nailed.gradle.tasks.deploy.SetupTask;
+import jk_5.nailed.gradle.tasks.deploy.UpdateRemoteLibraryListTask;
 import org.gradle.api.Action;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 
 import java.util.Map;
@@ -33,8 +33,11 @@ public class DeployPlugin extends BasePlugin {
         });
 
         this.getProject().getExtensions().create("nailedDeploy", DeployExtension.class, this.getProject());
+        this.getProject().getExtensions().create("nailedCredentials", CredentialsExtension.class);
 
-        this.makeTask("update", DefaultTask.class);
+        UpdateRemoteLibraryListTask updateTask = this.makeTask("updateRemote", UpdateRemoteLibraryListTask.class);
+
+        this.makeTask("update", DeployTask.class).dependsOn("updateRemote");
     }
 
     @Override
@@ -52,7 +55,12 @@ public class DeployPlugin extends BasePlugin {
         String taskName = "setup" + firstUppercase(ext.getType());
         SetupTask task = this.makeTask(taskName, taskType);
 
-        this.getProject().getTasks().getByName("update").dependsOn(taskName);
+        this.getProject().getTasks().getByName("updateRemote").dependsOn(taskName);
+
+        CredentialsExtension cext = CredentialsExtension.getInstance(this.getProject());
+        if(cext.getDeployServer() == null || cext.getDeployUsername() == null || cext.getDeployPassword() == null || cext.getVersionFile() == null){
+            this.getProject().getLogger().warn("Credentials are not set, skipping all tasks");
+        }
     }
 
     private static String firstUppercase(String input){
