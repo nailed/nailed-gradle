@@ -30,7 +30,10 @@ public class UpdateRemoteLibraryListTask extends DeployTask {
 
     @TaskAction
     public void doTask(){
-
+        for(Library lib : this.librariesToUpdate){
+            this.getLogger().lifecycle("Found library " + lib.name);
+            this.getLogger().lifecycle(lib.toString());
+        }
     }
 
     public void addLibrary(Library library){

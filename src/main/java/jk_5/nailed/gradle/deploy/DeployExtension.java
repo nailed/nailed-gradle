@@ -1,5 +1,6 @@
 package jk_5.nailed.gradle.deploy;
 
+import jk_5.nailed.gradle.json.deploy.RestartLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.gradle.api.Project;
@@ -24,8 +25,11 @@ public class DeployExtension {
     @Getter @Setter private String url = null;
     @Getter @Setter private String artifact = null;
     @Getter @Setter private String version = null;
+    @Getter @Setter private String name;
+    @Getter @Setter private RestartLevel restart = RestartLevel.NOTHING;
 
     public DeployExtension(Project project){
         this.project = project;
+        this.name = project.getName();
     }
 }

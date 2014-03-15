@@ -12,4 +12,46 @@ public class Library {
     public String destination;
     public String location;
     public RestartLevel restart;
+    public String server;
+
+    @Override
+    public String toString(){
+        final StringBuilder sb = new StringBuilder("Library{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", rev=").append(rev);
+        sb.append(", destination='").append(destination).append('\'');
+        sb.append(", location='").append(location).append('\'');
+        sb.append(", restart=").append(restart);
+        sb.append(", server='").append(server).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(o == null || getClass() != o.getClass()) return false;
+
+        Library library = (Library) o;
+
+        if(rev != library.rev) return false;
+        if(destination != null ? !destination.equals(library.destination) : library.destination != null) return false;
+        if(location != null ? !location.equals(library.location) : library.location != null) return false;
+        if(name != null ? !name.equals(library.name) : library.name != null) return false;
+        if(restart != library.restart) return false;
+        if(server != null ? !server.equals(library.server) : library.server != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode(){
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + rev;
+        result = 31 * result + (destination != null ? destination.hashCode() : 0);
+        result = 31 * result + (location != null ? location.hashCode() : 0);
+        result = 31 * result + (restart != null ? restart.hashCode() : 0);
+        result = 31 * result + (server != null ? server.hashCode() : 0);
+        return result;
+    }
 }

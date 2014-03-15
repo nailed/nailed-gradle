@@ -34,15 +34,14 @@ public class DeployPlugin extends BasePlugin {
 
         this.getProject().getExtensions().create("nailedDeploy", DeployExtension.class, this.getProject());
         this.getProject().getExtensions().create("nailedCredentials", CredentialsExtension.class);
-
-        UpdateRemoteLibraryListTask updateTask = this.makeTask("updateRemote", UpdateRemoteLibraryListTask.class);
-
-        this.makeTask("update", DeployTask.class).dependsOn("updateRemote");
     }
 
     @Override
     public void afterEvaluate(){
         super.afterEvaluate();
+
+        UpdateRemoteLibraryListTask updateTask = this.makeTask("updateRemote", UpdateRemoteLibraryListTask.class);
+        this.makeTask("update", DeployTask.class).dependsOn("updateRemote");
 
         DeployExtension ext = DeployExtension.getInstance(this.getProject());
 
@@ -54,6 +53,7 @@ public class DeployPlugin extends BasePlugin {
 
         String taskName = "setup" + firstUppercase(ext.getType());
         SetupTask task = this.makeTask(taskName, taskType);
+        task.setUpdateRemoteLibraryListTask(updateTask);
 
         this.getProject().getTasks().getByName("updateRemote").dependsOn(taskName);
 
