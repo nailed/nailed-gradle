@@ -27,6 +27,14 @@ public class DeployExtension {
     @Getter @Setter private String version = null;
     @Getter @Setter private String name;
     @Getter @Setter private RestartLevel restart = RestartLevel.NOTHING;
+    /**
+     * Update the launcher profile when we update?
+     */
+    @Getter @Setter private boolean updateProfile = false;
+    /**
+     * Let the updater check for changes even when the version stays the same.
+     */
+    @Getter @Setter private boolean versionUpdates = true;
 
     public DeployExtension(Project project){
         this.project = project;

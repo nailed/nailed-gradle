@@ -19,6 +19,7 @@ public class Constants {
     public static final String NEWLINE = System.getProperty("line.separator");
     public static final String NAILED_EXTENSION = "nailed";
     public static final String NAILED_JSON = "{JSON_FILE}";
+    public static final String NAILED_PROFILE_TEMPLATE = "https://raw.github.com/nailed/nailed-forge/master/jsons/profile-{MC_VERSION}.json";
     public static final String DEPENDENCY_CONFIG = "nailed";
     public static final String FML_JSON_URL = "https://raw.github.com/MinecraftForge/FML/master/jsons/{MC_VERSION}-rel.json";
     public static final String MINECRAFT_URL = "https://s3.amazonaws.com/Minecraft.Download/versions/{MC_VERSION}/{MC_VERSION}.jar";
@@ -100,6 +101,6 @@ public class Constants {
             IOUtils.closeQuietly(stream);
         }
 
-        return String.format("%1$0" + hashLength + "x", new Object[]{new BigInteger(1, stream.getMessageDigest().digest())});
+        return String.format("%1$0" + hashLength + "x", new BigInteger(1, stream.getMessageDigest().digest()));
     }
 }

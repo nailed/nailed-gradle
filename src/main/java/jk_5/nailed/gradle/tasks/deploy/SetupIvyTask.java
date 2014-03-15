@@ -9,7 +9,7 @@ import org.gradle.api.tasks.TaskAction;
  *
  * @author jk-5
  */
-public class SetupMavenTask extends SetupTask {
+public class SetupIvyTask extends SetupTask {
 
     @TaskAction
     public void doTask(){
@@ -18,6 +18,9 @@ public class SetupMavenTask extends SetupTask {
         library.name = ext.getName();
         library.restart = ext.getRestart();
 
+        library.location = ext.getUrl().replace("{VERSION}", ext.getVersion());
+        ext.setArtifact(ext.getArtifact().replace("{VERSION}", ext.getVersion()));
+
         String extensionParts[] = ext.getArtifact().split("@");
         String extension = "jar";
         if(extensionParts.length == 2){
@@ -25,13 +28,6 @@ public class SetupMavenTask extends SetupTask {
         }
         String parts[] = extensionParts[0].split(":");
         String parsed = parts[0].replace(".", "/") + "/" + parts[1] + "/" + parts[2];
-        if(parts.length == 4){
-            //We have a classifier. Do something with it
-            library.location = ext.getUrl() + parsed + "/" + parts[1] + "-" + parts[2] + "-" + parts[3] + "." + extension;
-        }else{
-            library.location = ext.getUrl() + parsed + "/" + parts[1] + "-" + parts[2] + "." + extension;
-        }
-        //The minecraft launcher doesn't support classifiers, so just leave them out.
         library.destination = "{MC_LIB_DIR}/" + parsed + "/" + parts[1] + "-" + parts[2] + "." + extension;
 
         this.registerLibrary(library);

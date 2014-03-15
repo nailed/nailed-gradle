@@ -2,9 +2,7 @@ package jk_5.nailed.gradle.deploy;
 
 import com.google.common.collect.Maps;
 import jk_5.nailed.gradle.common.BasePlugin;
-import jk_5.nailed.gradle.tasks.deploy.SetupMavenTask;
-import jk_5.nailed.gradle.tasks.deploy.SetupTask;
-import jk_5.nailed.gradle.tasks.deploy.UpdateRemoteLibraryListTask;
+import jk_5.nailed.gradle.tasks.deploy.*;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 
@@ -21,6 +19,7 @@ public class DeployPlugin extends BasePlugin {
 
     static {
         types.put("maven", SetupMavenTask.class);
+        types.put("ivy", SetupIvyTask.class);
     }
 
     @Override
@@ -41,7 +40,7 @@ public class DeployPlugin extends BasePlugin {
         super.afterEvaluate();
 
         UpdateRemoteLibraryListTask updateTask = this.makeTask("updateRemote", UpdateRemoteLibraryListTask.class);
-        this.makeTask("update", DeployTask.class).dependsOn("updateRemote");
+        this.makeTask("update", FinishUpdateTask.class).dependsOn("updateRemote");
 
         DeployExtension ext = DeployExtension.getInstance(this.getProject());
 
