@@ -34,7 +34,7 @@ public class UploadTask extends DefaultTask {
     @Getter @Setter private DelayedString remoteFile;
     @Getter @Setter private DelayedString destination;
     @Getter @Setter private DelayedString artifact;
-    @Getter @Setter private String restart = "no";
+    @Getter @Setter private String restart = "nothing";
 
     public UploadTask() {
         super();
@@ -103,7 +103,7 @@ public class UploadTask extends DefaultTask {
         sftp.cd(ext.getRemoteProfileDir());
         JsonObject versionData;
         try{
-            versionData = new JsonParser().parse(new InputStreamReader(sftp.get("versions.json"))).getAsJsonObject();
+            versionData = new JsonParser().parse(new InputStreamReader(sftp.get("versions-1.json"))).getAsJsonObject();
         }catch(Exception e){
             versionData = new JsonObject();
         }
@@ -128,9 +128,9 @@ public class UploadTask extends DefaultTask {
             fileInfo.remove("restart");
         }
         fileInfo.addProperty("destination", this.destination.call());
-        fileInfo.addProperty("location", this.remoteDir.call() + "/" + this.remoteFile.call());
-        if(!this.restart.equals("no")) fileInfo.addProperty("restart", this.restart);
-        sftp.put(new StringInputStream(new Gson().toJson(versionData)), "versions.json");
+        fileInfo.addProperty("location", ext.getLoadingMavenUrl() + this.remoteDir.call() + "/" + this.remoteFile.call());
+        if(!this.restart.equals("nothing")) fileInfo.addProperty("restart", this.restart);
+        sftp.put(new StringInputStream(new Gson().toJson(versionData)), "versions-1.json");
         sftp.exit();
         session.disconnect();
     }

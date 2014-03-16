@@ -28,9 +28,8 @@ public class DeploySubprojectTask extends UploadTask {
         this.setRemoteDir(this.delayedString(groupDir + "/Nailed-" + name + "/" + version));
         this.setRemoteFile(this.delayedString("Nailed-" + name + "-" + version + ".jar"));
         this.setUploadFile(this.delayedFile("{BUILD_DIR}/libs/Nailed-" + name + "-" + version + ".jar"));
-        this.setDestination(this.delayedString("{MC_LIB_DIR}/" + groupDir + "/Nailed-" + name + "/" + version + "/Nailed-" + name + "-" + version + ".jar"));
         this.setArtifact(this.delayedString("nailed" + name));
-        this.setRestart("game");
+        this.setDestination(this.delayedString(this.getDestination().call().replace("{ART_GROUP}", groupDir).replace("{ART_NAME}", name).replace("{ART_VERSION}", version)));
 
         super.doTask();
     }

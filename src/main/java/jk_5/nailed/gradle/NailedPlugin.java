@@ -72,10 +72,23 @@ public class NailedPlugin extends BasePlugin implements DelayedBase.IDelayedReso
     public void afterEvaluate(){
         super.afterEvaluate();
 
-        for(Project p : NailedExtension.getInstance(this.getProject()).getDeployedProjects()){
+        NailedExtension ext = NailedExtension.getInstance(this.getProject());
+
+        for(Project p : ext.getDeployed()){
             DeploySubprojectTask task = this.makeTask("deploy" + p.getName(), DeploySubprojectTask.class);
             task.setSubProject(p);
             task.dependsOn("build");
+            task.setDestination(this.delayedString("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar"));
+            this.getProject().getTasks().getByName("deploy").dependsOn("deploy" + p.getName());
+            task.setRestart("game");
+            launcherProfileTask.addDependency(this.delayedString(p.getGroup() + ":Nailed-" + p.getName() + ":" + p.getVersion()));
+        }
+
+        for(Project p : ext.getDeployedMods()){
+            DeploySubprojectTask task = this.makeTask("deploy" + p.getName(), DeploySubprojectTask.class);
+            task.setSubProject(p);
+            task.dependsOn("build");
+            task.setDestination(this.delayedString("{MC_GAME_DIR}/mods/Nailed-{ART_NAME}-{ART_VERSION}.jar"));
             this.getProject().getTasks().getByName("deploy").dependsOn("deploy" + p.getName());
         }
 

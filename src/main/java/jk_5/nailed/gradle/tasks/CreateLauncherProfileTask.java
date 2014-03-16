@@ -12,7 +12,6 @@ import jk_5.nailed.gradle.extension.NailedExtension;
 import lombok.Getter;
 import lombok.Setter;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.FileWriter;
@@ -48,9 +47,9 @@ public class CreateLauncherProfileTask extends DefaultTask {
         JsonObject remoteInfo = parsed.getAsJsonObject().getAsJsonObject("versionInfo");
         JsonArray libs = remoteInfo.getAsJsonArray("libraries");
         JsonArray newArray = new JsonArray();
-        for(Project project : ext.getDeployedProjects()){
+        /*for(Project project : ext.getDeployedProjects()){
             this.addDependency(new DelayedString(this.getProject(), project.getGroup() + ":Nailed-" + project.getName() + ":" + project.getVersion()));
-        }
+        }*/
         for(Pair<DelayedString, DelayedString> dep : this.dependencies){
             JsonObject obj = new JsonObject();
             obj.addProperty("name", dep.getKey().call());

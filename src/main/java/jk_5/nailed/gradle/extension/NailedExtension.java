@@ -32,19 +32,12 @@ public class NailedExtension {
     @Getter @Setter private String deployPassword = null;
     @Getter @Setter private String remoteProfileDir = "";
     @Getter private List<String> tweakers = Lists.newArrayList();
-    @Getter private List<Project> deployedProjects = Lists.newArrayList();
+    @Getter private List<Project> deployed = Lists.newArrayList();
+    @Getter private List<Project> deployedMods = Lists.newArrayList();
     @Getter private List<String> additionalLibs = Lists.newArrayList();
 
     public void setLauncherDependency(String dep){
         ((CreateLauncherProfileTask) this.project.getTasks().getByName("createLauncherProfile")).addDependency(new DelayedString(this.project, dep));
-    }
-
-    public void setDeployedArtifact(String artifact){
-        for(Project p : this.project.getSubprojects()){
-            if(p.getName().equals(artifact)){
-                this.deployedProjects.add(p);
-            }
-        }
     }
 
     public void setAdditionalLib(String additionalLib){
@@ -53,6 +46,22 @@ public class NailedExtension {
 
     public void setTweaker(String tweaker){
         this.tweakers.add(tweaker);
+    }
+
+    public void setDeployedMod(String deployedMod){
+        for(Project p : this.project.getSubprojects()){
+            if(p.getName().equals(deployedMod)){
+                this.deployedMods.add(p);
+            }
+        }
+    }
+
+    public void setDeployed(String deployed){
+        for(Project p : this.project.getSubprojects()){
+            if(p.getName().equals(deployed)){
+                this.deployed.add(p);
+            }
+        }
     }
 
     public NailedExtension(Project project){
