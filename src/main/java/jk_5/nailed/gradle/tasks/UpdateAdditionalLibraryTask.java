@@ -15,7 +15,6 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.InputStreamReader;
-import java.util.Properties;
 
 /**
  * No description given
@@ -24,9 +23,9 @@ import java.util.Properties;
  */
 public class UpdateAdditionalLibraryTask extends DefaultTask {
 
-    @Getter @Setter private DelayedString mavenPath;
-    @Getter @Setter private DelayedString artifact;
     @Getter @Setter private DelayedString destination;
+    @Getter @Setter private DelayedString location;
+    @Getter @Setter private String artifact;
     @Getter @Setter private String restart;
 
     public UpdateAdditionalLibraryTask() {
@@ -52,17 +51,10 @@ public class UpdateAdditionalLibraryTask extends DefaultTask {
         String username = ext.getDeployUsername();
         String password = ext.getDeployPassword();
 
-        String group = this.mavenPath.call().split(":", 2)[0];
-        String artifact = this.mavenPath.call().split(":", 2)[1];
-        String version = this.mavenPath.call().split(":", 2)[2];
-        String location = group.replace(".", "/") + "/" + artifact + "/" + artifact + "-" + version + ".jar";
-
         JSch jsch = new JSch();
         Session session = jsch.getSession(username, host);
         session.setPassword(password);
-        Properties config = new Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
+        session.setConfig("StrictHostKeyChecking", "no");
         session.connect();
         Channel channel = session.openChannel("sftp");
         channel.connect();
@@ -71,14 +63,14 @@ public class UpdateAdditionalLibraryTask extends DefaultTask {
         sftp.cd(ext.getRemoteProfileDir());
         JsonObject versionData;
         try{
-            versionData = new JsonParser().parse(new InputStreamReader(sftp.get("versions.json"))).getAsJsonObject();
+            versionData = new JsonParser().parse(new InputStreamReader(sftp.get("versions-1.json"))).getAsJsonObject();
         }catch(Exception e){
             versionData = new JsonObject();
         }
-        if(!versionData.has(this.artifact.call())){
-            versionData.add(this.artifact.call(), new JsonObject());
+        if(!versionData.has(artifact)){
+            versionData.add(artifact, new JsonObject());
         }
-        JsonObject fileInfo = versionData.getAsJsonObject(this.artifact.call());
+        JsonObject fileInfo = versionData.getAsJsonObject(artifact);
         if(!fileInfo.has("rev")){
             fileInfo.addProperty("rev", 0);
         }else{
@@ -96,9 +88,9 @@ public class UpdateAdditionalLibraryTask extends DefaultTask {
             fileInfo.remove("restart");
         }
         fileInfo.addProperty("destination", this.destination.call());
-        fileInfo.addProperty("location", location);
-        if(!this.restart.equals("no")) fileInfo.addProperty("restart", this.restart);
-        sftp.put(new StringInputStream(new Gson().toJson(versionData)), "versions.json");
+        fileInfo.addProperty("location", this.location.call());
+        if(!this.restart.equals("nothing")) fileInfo.addProperty("restart", this.restart);
+        sftp.put(new StringInputStream(new Gson().toJson(versionData)), "versions-1.json");
         sftp.exit();
         session.disconnect();
     }

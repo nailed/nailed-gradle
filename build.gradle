@@ -20,7 +20,7 @@ repositories {
 }
 
 group = 'jk_5.nailed.gradle'
-version = '1.1.1-SNAPSHOT'
+version = '1.1.2-SNAPSHOT'
 targetCompatibility = '1.6'
 sourceCompatibility = '1.6'
 

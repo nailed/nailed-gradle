@@ -3,7 +3,10 @@ package jk_5.nailed.gradle;
 import jk_5.nailed.gradle.common.BasePlugin;
 import jk_5.nailed.gradle.delayed.DelayedBase;
 import jk_5.nailed.gradle.extension.NailedExtension;
-import jk_5.nailed.gradle.tasks.*;
+import jk_5.nailed.gradle.tasks.CreateLauncherProfileTask;
+import jk_5.nailed.gradle.tasks.DeploySubprojectTask;
+import jk_5.nailed.gradle.tasks.UpdateAdditionalLibraryTask;
+import jk_5.nailed.gradle.tasks.UploadTask;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 
@@ -37,35 +40,35 @@ public class NailedPlugin extends BasePlugin implements DelayedBase.IDelayedReso
         uploadProfileTask.setRestart("launcher");
         uploadProfileTask.dependsOn("createLauncherProfile");
 
-        DownloadTask downloadMinecraftTask = this.makeTask("downloadMinecraft", DownloadTask.class);
+        /*DownloadTask downloadMinecraftTask = this.makeTask("downloadMinecraft", DownloadTask.class);
         downloadMinecraftTask.setUrl(this.delayedString(Constants.MINECRAFT_URL));
-        downloadMinecraftTask.setOutput(this.delayedFile(Constants.MINECRAFT_CACHE));
+        downloadMinecraftTask.setOutput(this.delayedFile(Constants.MINECRAFT_CACHE));*/
 
-        UploadTask deployMinecraftTask = this.makeTask("deployMinecraft", UploadTask.class);
-        deployMinecraftTask.setRemoteDir(this.delayedString("jk_5/nailed/deploy/minecraft/{MC_VERSION}"));
+        /*UploadTask deployMinecraftTask = this.makeTask("deployMinecraft", UploadTask.class);
+        deployMinecraftTask.setRemoteDir(this.delayedString("net/minecraft/minecraft/{MC_VERSION}"));
         deployMinecraftTask.setRemoteFile(this.delayedString("minecraft-{MC_VERSION}.jar"));
         deployMinecraftTask.setUploadFile(this.delayedFile(Constants.MINECRAFT_CACHE));
         deployMinecraftTask.setDestination(this.delayedString("{MC_LIB_DIR}/jk_5/nailed/deploy/minecraft/{MC_VERSION}/minecraft-{MC_VERSION}.jar"));
         deployMinecraftTask.setArtifact(this.delayedString("minecraft"));
         deployMinecraftTask.setRestart("game");
-        deployMinecraftTask.dependsOn("downloadMinecraft");
-        launcherProfileTask.addDependency(this.delayedString("jk_5.nailed.deploy:minecraft:{MC_VERSION}"));
+        deployMinecraftTask.dependsOn("downloadMinecraft");*/
+        //launcherProfileTask.addDependency(this.delayedString("net.minecraft:minecraft:{MC_VERSION}"));
 
-        DownloadTask downloadForgeTask = this.makeTask("downloadForge", DownloadTask.class);
+        /*DownloadTask downloadForgeTask = this.makeTask("downloadForge", DownloadTask.class);
         downloadForgeTask.setUrl(this.delayedString(Constants.FORGE_URL));
-        downloadForgeTask.setOutput(this.delayedFile(Constants.FORGE_CACHE));
+        downloadForgeTask.setOutput(this.delayedFile(Constants.FORGE_CACHE));*/
 
-        UploadTask deployForgeTask = this.makeTask("deployForge", UploadTask.class);
-        deployForgeTask.setRemoteDir(this.delayedString("jk_5/nailed/deploy/forge/{FORGE_VERSION}"));
+        /*UploadTask deployForgeTask = this.makeTask("deployForge", UploadTask.class);
+        deployForgeTask.setRemoteDir(this.delayedString("net/minecraftforge/forge/{FORGE_VERSION}"));
         deployForgeTask.setRemoteFile(this.delayedString("forge-{FORGE_VERSION}.jar"));
         deployForgeTask.setUploadFile(this.delayedFile(Constants.FORGE_CACHE));
         deployForgeTask.setDestination(this.delayedString("{MC_LIB_DIR}/jk_5/nailed/deploy/forge/{FORGE_VERSION}/forge-{FORGE_VERSION}.jar"));
         deployForgeTask.setArtifact(this.delayedString("forge"));
         deployForgeTask.setRestart("game");
-        deployForgeTask.dependsOn("downloadForge");
-        launcherProfileTask.addDependency(this.delayedString("jk_5.nailed.deploy:forge:{FORGE_VERSION}"));
+        deployForgeTask.dependsOn("downloadForge");*/
+        //launcherProfileTask.addDependency(this.delayedString("net.minecraftforge:forge:{MC_VERSION}-{FORGE_VERSION}"));
 
-        this.makeTask("deploy", DefaultTask.class).dependsOn("deployLauncherProfile", "deployMinecraft", "deployForge");
+        this.makeTask("deploy", DefaultTask.class).dependsOn("deployLauncherProfile");
     }
 
     @Override
@@ -77,11 +80,11 @@ public class NailedPlugin extends BasePlugin implements DelayedBase.IDelayedReso
         for(Project p : ext.getDeployed()){
             DeploySubprojectTask task = this.makeTask("deploy" + p.getName(), DeploySubprojectTask.class);
             task.setSubProject(p);
-            task.dependsOn("build");
+            task.dependsOn(p.getName() + ":build");
             task.setDestination(this.delayedString("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar"));
             this.getProject().getTasks().getByName("deploy").dependsOn("deploy" + p.getName());
             task.setRestart("game");
-            launcherProfileTask.addDependency(this.delayedString(p.getGroup() + ":Nailed-" + p.getName() + ":" + p.getVersion()));
+            //launcherProfileTask.addDependency(this.delayedString(p.getGroup() + ":Nailed-" + p.getName() + ":" + p.getVersion()));
         }
 
         for(Project p : ext.getDeployedMods()){
@@ -92,12 +95,26 @@ public class NailedPlugin extends BasePlugin implements DelayedBase.IDelayedReso
             this.getProject().getTasks().getByName("deploy").dependsOn("deploy" + p.getName());
         }
 
-        for(String l : NailedExtension.getInstance(this.getProject()).getAdditionalLibs()){
+        /*for(String l : NailedExtension.getInstance(this.getProject()).getAdditionalLibs()){
             UpdateAdditionalLibraryTask task = this.makeTask("update" + l.split(":")[1], UpdateAdditionalLibraryTask.class);
             task.setMavenPath(this.delayedString(l));
-            //task.setDestination(this.delayedString());
+            task.setRestart("nothing");
             this.launcherProfileTask.addDependency(this.delayedString(l));
-        }
+        }*/
+
+        UpdateAdditionalLibraryTask updateForgeTask = this.makeTask("updateForge", UpdateAdditionalLibraryTask.class);
+        updateForgeTask.setDestination(this.delayedString("{MC_LIB_DIR}/net/minecraftforge/forge/{MC_VERSION}-{FORGE_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}.jar"));
+        updateForgeTask.setLocation(this.delayedString("http://files.minecraftforge.net/maven/net/minecraftforge/forge/{MC_VERSION}-{FORGE_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}-universal.jar"));
+        updateForgeTask.setArtifact("forge");
+        updateForgeTask.setRestart("nothing");
+        launcherProfileTask.addDependency(this.delayedString("net.minecraftforge:forge:{MC_VERSION}-{FORGE_VERSION}"), this.delayedString(Constants.MINECRAFT_MAVEN));
+
+        UpdateAdditionalLibraryTask updateMCTask = this.makeTask("updateMinecraft", UpdateAdditionalLibraryTask.class);
+        updateMCTask.setDestination(this.delayedString("{MC_LIB_DIR}/net/minecraft/minecraft/{MC_VERSION}/minecraft-{MC_VERSION}.jar"));
+        updateMCTask.setLocation(this.delayedString(Constants.MINECRAFT_URL));
+        updateMCTask.setArtifact("minecraft");
+        updateMCTask.setRestart("nothing");
+        launcherProfileTask.addDependency(this.delayedString("net.minecraft:minecraft:{MC_VERSION}"), this.delayedString(Constants.MINECRAFT_MAVEN));
     }
 
     @Override
