@@ -64,6 +64,11 @@ public class CreateLauncherProfileTask extends DefaultTask {
             JsonObject object = element.getAsJsonObject();
             if(!object.get("name").getAsString().equals("@artifact@")){
                 JsonObject newObject = new JsonObject();
+                String name = object.get("name").getAsString();
+                if(name.startsWith("org.scala-lang")){ //Use our mirror for scala libs. Forge only hosts compressed versions
+                    object.remove("url");
+                    object.addProperty("url", "http://maven.reening.nl/");
+                }
                 newObject.addProperty("name", object.get("name").getAsString());
                 if(object.has("url")) newObject.add("url", object.get("url"));
                 if(object.has("rules")) newObject.add("rules", object.get("rules"));
@@ -75,7 +80,7 @@ public class CreateLauncherProfileTask extends DefaultTask {
         reader.close();
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        StringBuilder argsBuilder = new StringBuilder("--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userProperties ${user_properties} --userType ${user_type}");
+        StringBuilder argsBuilder = new StringBuilder("--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${game_assets} --uuid ${auth_uuid} --accessToken ${auth_access_token}");
         for(String string : ext.getTweakers()){
             argsBuilder.append(" --tweakClass ");
             argsBuilder.append(string);
@@ -86,7 +91,6 @@ public class CreateLauncherProfileTask extends DefaultTask {
         newRoot.addProperty("mainClass", ext.getMainClass());
         newRoot.addProperty("minimumLauncherVersion", remoteInfo.get("minimumLauncherVersion").getAsInt());
         newRoot.addProperty("type", "release");
-        newRoot.addProperty("processArguments", "username_session_version");
         newRoot.addProperty("time", format.format(new Date()));
         newRoot.addProperty("releaseTime", format.format(new Date()));
         newRoot.addProperty("sync", false);
@@ -101,10 +105,10 @@ public class CreateLauncherProfileTask extends DefaultTask {
     }
 
     public void addDependency(DelayedString name){
-        this.dependencies.add(new Pair<DelayedString, DelayedString>(name, new DelayedString(this.getProject(), "{MAVEN_URL}")));
+        this.dependencies.add(new Pair<>(name, new DelayedString(this.getProject(), "{MAVEN_URL}")));
     }
 
     public void addDependency(DelayedString name, DelayedString mavenUrl){
-        this.dependencies.add(new Pair<DelayedString, DelayedString>(name, mavenUrl));
+        this.dependencies.add(new Pair<>(name, mavenUrl));
     }
 }

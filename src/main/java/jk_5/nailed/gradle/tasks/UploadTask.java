@@ -35,6 +35,7 @@ public class UploadTask extends DefaultTask {
     @Getter @Setter private DelayedString destination;
     @Getter @Setter private DelayedString artifact;
     @Getter @Setter private String restart = "nothing";
+    @Getter @Setter private boolean mod = false;
 
     public UploadTask() {
         super();
@@ -127,9 +128,13 @@ public class UploadTask extends DefaultTask {
         if(fileInfo.has("restart")){
             fileInfo.remove("restart");
         }
+        if(fileInfo.has("mod")){
+            fileInfo.remove("mod");
+        }
         fileInfo.addProperty("destination", this.destination.call());
         fileInfo.addProperty("location", ext.getLoadingMavenUrl() + this.remoteDir.call() + "/" + this.remoteFile.call());
         if(!this.restart.equals("nothing")) fileInfo.addProperty("restart", this.restart);
+        fileInfo.addProperty("mod", this.mod);
         sftp.put(new StringInputStream(new Gson().toJson(versionData)), "versions-1.json");
         sftp.exit();
         session.disconnect();
