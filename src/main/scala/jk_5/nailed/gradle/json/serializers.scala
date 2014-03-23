@@ -15,7 +15,12 @@ import java.text.{ParseException, SimpleDateFormat, DateFormat}
  * @author jk-5
  */
 object Serialization {
-  val gson = new GsonBuilder().registerTypeAdapterFactory(new EnumAdapterFactory).registerTypeAdapter(classOf[Date], new DateAdapter).enableComplexMapKeySerialization().setPrettyPrinting().create()
+  val gson = new GsonBuilder()
+    .registerTypeAdapterFactory(new EnumAdapterFactory)
+    .registerTypeAdapter(classOf[Date], new DateAdapter)
+    .enableComplexMapKeySerialization()
+    .setPrettyPrinting()
+    .create()
 }
 
 class EnumAdapterFactory extends TypeAdapterFactory {

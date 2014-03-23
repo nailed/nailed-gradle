@@ -3,8 +3,7 @@ package jk_5.nailed.gradle.tasks
 import org.gradle.api.DefaultTask
 import jk_5.nailed.gradle.delayed.DelayedString
 import jk_5.nailed.gradle.extension.NailedExtension
-import com.google.common.base.Strings
-import com.jcraft.jsch.{ChannelSftp, Session}
+import com.jcraft.jsch.Session
 import com.google.gson.{JsonParser, JsonObject}
 import java.io.InputStreamReader
 import jk_5.nailed.gradle.Constants
@@ -28,6 +27,7 @@ class UpdateAdditionalLibraryTask extends DefaultTask {
 
   @TaskAction def doTask(){
     val sftp = SshConnectionPool.getConnection(this.getProject)
+    sftp.cd(NailedExtension.getInstance(this.getProject).getRemoteProfileDir)
     val libList = LibraryList.readFromStream(sftp.get(Constants.REMOTE_VERSION_FILE))
     val libOption = libList.getArtifact(this.artifact.call)
     if(libOption.isEmpty){

@@ -1,12 +1,15 @@
 package jk_5.nailed.gradle
 
-import jk_5.nailed.gradle.common.BasePlugin
+import jk_5.nailed.gradle.common.{SshConnectionPool, BasePlugin}
 import scala.util.Properties
 import jk_5.nailed.gradle.tasks.{UpdateAdditionalLibraryTask, DeploySubprojectTask, UploadTask, CreateLauncherProfileTask}
 import jk_5.nailed.gradle.extension.NailedExtension
 import org.gradle.api.DefaultTask
 import scala.collection.JavaConversions._
 import jk_5.nailed.gradle.json.{RestartLevel, LauncherLibrary}
+import org.gradle.{BuildResult, BuildListener}
+import org.gradle.api.invocation.Gradle
+import org.gradle.api.initialization.Settings
 
 /**
  * No description given
@@ -33,6 +36,16 @@ class NailedPlugin extends BasePlugin {
   private var launcherProfileTask: CreateLauncherProfileTask = null
 
   override def applyPlugin(){
+    this.getProject.getGradle.addBuildListener(new BuildListener {
+      override def projectsLoaded(gradle: Gradle){}
+      override def projectsEvaluated(gradle: Gradle){}
+      override def settingsEvaluated(settings: Settings){}
+      override def buildStarted(gradle: Gradle){}
+      override def buildFinished(result: BuildResult){
+        SshConnectionPool.close()
+      }
+    })
+
     this.getProject.getExtensions.create(Constants.NAILED_EXTENSION, classOf[NailedExtension], this.getProject)
     this.registerTasks()
   }
@@ -67,7 +80,7 @@ class NailedPlugin extends BasePlugin {
       task.setSubProject(p)
       task.dependsOn("build")
       task.setDestination(this.delayedString("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar"))
-      task.setIsMod(true)
+      task.setIsMod(isMod = true)
       this.getProject.getTasks.getByName("deploy").dependsOn("deploy" + p.getName)
     })
     val updateForgeTask = this.makeTask("updateForge", classOf[UpdateAdditionalLibraryTask])
@@ -75,6 +88,7 @@ class NailedPlugin extends BasePlugin {
     updateForgeTask.setLocation(this.delayedString("http://files.minecraftforge.net/maven/net/minecraftforge/forge/{MC_VERSION}-{FORGE_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}-universal.jar"))
     updateForgeTask.setArtifact("forge")
     updateForgeTask.setRestart(RestartLevel.NOTHING)
+    updateForgeTask.dependsOn("deployLauncherProfile")
     launcherProfileTask.addDependency(new LauncherLibrary("net.minecraftforge:forge:{MC_VERSION}-{FORGE_VERSION}"))
 
     val updateMCTask = this.makeTask("updateMinecraft", classOf[UpdateAdditionalLibraryTask])

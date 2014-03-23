@@ -1,7 +1,7 @@
 package jk_5.nailed.gradle.tasks
 
 import org.gradle.api.DefaultTask
-import jk_5.nailed.gradle.delayed.{DelayedFile, DelayedString}
+import jk_5.nailed.gradle.delayed.{DelayedBase, DelayedFile, DelayedString}
 import jk_5.nailed.gradle.extension.NailedExtension
 import java.net.URL
 import jk_5.nailed.gradle.Constants
@@ -36,7 +36,7 @@ class CreateLauncherProfileTask extends DefaultTask {
     reader.close()
 
     ext.getDeployed.foreach(p => {
-      this.addDependency(new LauncherLibrary(p.getGroup + ":Nailed-" + p.getName + ":" + p.getVersion))
+      this.addDependency(new LauncherLibrary(p.getGroup + ":Nailed-" + p.getName + ":" + p.getVersion, "http://maven.reening.nl/"))
     })
     this.dependencies.foreach(newProfile.libraries.add)
     fmlProfile.libraries.filter(p => p.name != "@artifact@").foreach(l => {
@@ -45,9 +45,13 @@ class CreateLauncherProfileTask extends DefaultTask {
       }
       newProfile.libraries.add(l)
     })
+    newProfile.libraries.foreach(l => {
+      l.name = DelayedBase.resolve(l.name, this.getProject)
+      if(l.url != null) l.url = DelayedBase.resolve(l.url, this.getProject)
+    })
 
     val argsBuilder = new StringBuilder(fmlProfile.minecraftArguments.split(" --tweakClass ", 2)(0))
-    ext.getTweakers.foreach(t => argsBuilder.append(" --tweakClass").append(t))
+    ext.getTweakers.foreach(t => argsBuilder.append(" --tweakClass ").append(t))
 
     newProfile.id = ext.getVersionName
     newProfile.mainClass = ext.getMainClass

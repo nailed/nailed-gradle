@@ -3,7 +3,7 @@ package jk_5.nailed.gradle.json
 import java.util
 import java.util.Date
 import com.google.gson.annotations.SerializedName
-import com.google.common.collect.{Maps, Lists}
+import com.google.common.collect.Lists
 import jk_5.nailed.gradle.Constants
 
 /**
@@ -14,17 +14,17 @@ import jk_5.nailed.gradle.Constants
 class LauncherProfile{
 
   var id: String = _
-  var time: Date = _
-  var releaseTime: Date = _
-  @SerializedName("type") var typ: String = _
-  var minecraftArguments: String = _
-  var libraries: util.List[LauncherLibrary] = Lists.newArrayList()
   var mainClass: String = _
   var minimumLauncherVersion: Int = _
   var incompatibilityReason: String = _
-  var assets: String = _
+  @SerializedName("type") var typ: String = _
+  var time: Date = _
+  var releaseTime: Date = _
   var sync: Boolean = _
-  var rules: util.List[OSRule] = Lists.newArrayList()
+  var minecraftArguments: String = _
+  var libraries: util.List[LauncherLibrary] = Lists.newArrayList()
+  var assets: String = _
+  var rules: util.List[OSRule] = _
 }
 
 class OSRule{
@@ -40,9 +40,9 @@ class OSRule{
 
 class LauncherLibrary(var name: String = null, var url: String = null){
 
-  var rules: util.List[OSRule] = Lists.newArrayList()
-  var natives: util.Map[OS, String] = Maps.newHashMap()
+  var rules: util.List[OSRule] = _
   var extract: ExtractRule = _
+  var natives: util.Map[OS, String] = _
   @transient private var artifact: Artifact = null
 
   def getPath: String = {
