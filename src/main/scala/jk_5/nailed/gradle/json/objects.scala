@@ -22,6 +22,7 @@ class Library {
 class LibraryList {
   var versionName: String = _
   var libraries: util.List[Library] = _ //We need a java list here. Gson doesn't know how to handle scala collections
+  var tweakers: util.List[String] = _ //We need a java list here. Gson doesn't know how to handle scala collections
 
   def getArtifact(name: String): Option[Library] = this.libraries.find(_.name == name)
 }

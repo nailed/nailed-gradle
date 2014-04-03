@@ -25,6 +25,7 @@ class NailedExtension(val project: Project) {
   private var deployPassword: String = null
   private var remoteProfileDir: String = ""
   private val tweakers = new util.ArrayList[String]
+  private val launcherTweakers = new util.ArrayList[String]
   private val deployed = new util.ArrayList[Project]
   private val deployedMods = new util.ArrayList[Project]
   private val additionalLibs = new util.ArrayList[String]
@@ -39,6 +40,7 @@ class NailedExtension(val project: Project) {
   @inline def getDeployPassword = this.deployPassword
   @inline def getRemoteProfileDir = this.remoteProfileDir
   @inline def getTweakers = this.tweakers
+  @inline def getLauncherTweakers = this.launcherTweakers
   @inline def getDeployed = this.deployed
   @inline def getDeployedMods = this.deployedMods
   @inline def getAdditionalLibs = this.additionalLibs
@@ -53,6 +55,7 @@ class NailedExtension(val project: Project) {
   @inline def setDeployPassword(deployPassword: String) = this.deployPassword = deployPassword
   @inline def setRemoteProfileDir(remoteProfileDir: String) = this.remoteProfileDir = remoteProfileDir
   @inline def setTweaker(tweaker: String) = this.tweakers.add(tweaker)
+  @inline def setLauncherTweaker(launcherTweaker: String) = this.launcherTweakers.add(launcherTweaker)
   @inline def setDeployed(deployed: String) = this.project.getSubprojects.filter(_.getName == deployed).foreach(this.deployed.add)
   @inline def setDeployedMod(deployedMod: String) = this.project.getSubprojects.filter(_.getName == deployedMod).foreach(this.deployedMods.add)
   @inline def setAdditionalLib(additionalLib: String) = this.additionalLibs.add(additionalLib)

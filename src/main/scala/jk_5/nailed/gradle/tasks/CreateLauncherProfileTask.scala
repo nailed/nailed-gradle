@@ -51,7 +51,7 @@ class CreateLauncherProfileTask extends DefaultTask {
     })
 
     val argsBuilder = new StringBuilder(fmlProfile.minecraftArguments.split(" --tweakClass ", 2)(0))
-    ext.getTweakers.foreach(t => argsBuilder.append(" --tweakClass ").append(t))
+    ext.getLauncherTweakers.foreach(t => argsBuilder.append(" --tweakClass ").append(t))
 
     newProfile.id = ext.getVersionName
     newProfile.mainClass = ext.getMainClass

@@ -4,9 +4,8 @@ import org.gradle.api.DefaultTask
 import jk_5.nailed.gradle.delayed.{DelayedString, DelayedFile}
 import jk_5.nailed.gradle.extension.NailedExtension
 import jk_5.nailed.gradle.Constants
-import java.io.{FileInputStream, BufferedReader}
+import java.io.FileInputStream
 import org.apache.tools.ant.filters.StringInputStream
-import com.google.gson.JsonObject
 import org.gradle.api.tasks.TaskAction
 import jk_5.nailed.gradle.common.{SshUtils, SshConnectionPool}
 import jk_5.nailed.gradle.json.{Serialization, Library, LibraryList, RestartLevel}
@@ -38,6 +37,7 @@ class UploadTask extends DefaultTask {
 
     val libList = LibraryList.readFromStream(sftp.get(Constants.REMOTE_VERSION_FILE))
     val libOption = libList.getArtifact(this.artifact.call)
+    libList.tweakers = ext.getTweakers
     if(libOption.isEmpty){
       val l = new Library
       l.name = this.artifact.call

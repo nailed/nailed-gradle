@@ -4,12 +4,11 @@ import org.gradle.api.DefaultTask
 import jk_5.nailed.gradle.delayed.DelayedString
 import jk_5.nailed.gradle.extension.NailedExtension
 import com.jcraft.jsch.Session
-import com.google.gson.{JsonParser, JsonObject}
+import com.google.gson.JsonObject
 import java.io.InputStreamReader
 import jk_5.nailed.gradle.Constants
 import org.apache.tools.ant.filters.StringInputStream
 import org.gradle.api.tasks.TaskAction
-import groovy.lang.Closure
 import jk_5.nailed.gradle.json.{Serialization, Library, LibraryList, RestartLevel}
 import jk_5.nailed.gradle.common.SshConnectionPool
 
@@ -26,8 +25,9 @@ class UpdateAdditionalLibraryTask extends DefaultTask {
   private var restart = RestartLevel.NOTHING
 
   @TaskAction def doTask(){
+    val ext = NailedExtension.getInstance(this.getProject)
     val sftp = SshConnectionPool.getConnection(this.getProject)
-    sftp.cd(NailedExtension.getInstance(this.getProject).getRemoteProfileDir)
+    sftp.cd(ext.getRemoteProfileDir)
     val libList = LibraryList.readFromStream(sftp.get(Constants.REMOTE_VERSION_FILE))
     val libOption = libList.getArtifact(this.artifact.call)
     if(libOption.isEmpty){
@@ -35,6 +35,7 @@ class UpdateAdditionalLibraryTask extends DefaultTask {
       l.name = this.artifact.call
       libList.libraries.add(l)
     }
+    libList.tweakers = ext.getTweakers
     val lib = libList.getArtifact(this.artifact.call).get
     lib.rev += 1
     lib.destination = this.destination.call
