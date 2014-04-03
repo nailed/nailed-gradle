@@ -6,7 +6,7 @@ import jk_5.nailed.gradle.tasks.{UpdateAdditionalLibraryTask, DeploySubprojectTa
 import jk_5.nailed.gradle.extension.NailedExtension
 import org.gradle.api.DefaultTask
 import scala.collection.JavaConversions._
-import jk_5.nailed.gradle.json.{RestartLevel, LauncherLibrary}
+import jk_5.nailed.gradle.json.RestartLevel
 import org.gradle.{BuildResult, BuildListener}
 import org.gradle.api.invocation.Gradle
 import org.gradle.api.initialization.Settings
@@ -33,7 +33,6 @@ object Constants {
 }
 
 class NailedPlugin extends BasePlugin {
-  private var launcherProfileTask: CreateLauncherProfileTask = null
 
   override def applyPlugin(){
     this.getProject.getGradle.addBuildListener(new BuildListener {
@@ -51,7 +50,7 @@ class NailedPlugin extends BasePlugin {
   }
 
   def registerTasks(){
-    launcherProfileTask = this.makeTask("createLauncherProfile", classOf[CreateLauncherProfileTask])
+    val launcherProfileTask = this.makeTask("createLauncherProfile", classOf[CreateLauncherProfileTask])
     launcherProfileTask.setDestination(this.delayedFile(Constants.PROFILE_LOCATION))
     launcherProfileTask.setFmlJson(this.delayedString(Constants.FML_JSON_URL))
     val uploadProfileTask = this.makeTask("deployLauncherProfile", classOf[UploadTask])
@@ -89,13 +88,11 @@ class NailedPlugin extends BasePlugin {
     updateForgeTask.setArtifact("forge")
     updateForgeTask.setRestart(RestartLevel.NOTHING)
     updateForgeTask.dependsOn("deployLauncherProfile")
-    launcherProfileTask.addDependency(new LauncherLibrary("net.minecraftforge:forge:{MC_VERSION}-{FORGE_VERSION}"))
 
     val updateMCTask = this.makeTask("updateMinecraft", classOf[UpdateAdditionalLibraryTask])
     updateMCTask.setDestination(this.delayedString("{MC_LIB_DIR}/net/minecraft/minecraft/{MC_VERSION}/minecraft-{MC_VERSION}.jar"))
     updateMCTask.setLocation(this.delayedString(Constants.MINECRAFT_URL))
     updateMCTask.setArtifact("minecraft")
     updateMCTask.setRestart(RestartLevel.NOTHING)
-    launcherProfileTask.addDependency(new LauncherLibrary("net.minecraft:minecraft:{MC_VERSION}"))
   }
 }

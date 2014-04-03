@@ -35,9 +35,6 @@ class CreateLauncherProfileTask extends DefaultTask {
     val newProfile = new LauncherProfile
     reader.close()
 
-    ext.getDeployed.foreach(p => {
-      this.addDependency(new LauncherLibrary(p.getGroup + ":Nailed-" + p.getName + ":" + p.getVersion, "http://maven.reening.nl/"))
-    })
     this.dependencies.foreach(newProfile.libraries.add)
     fmlProfile.libraries.filter(p => p.name != "@artifact@").foreach(l => {
       if(l.name.startsWith("org.scala-lang")){
@@ -70,6 +67,8 @@ class CreateLauncherProfileTask extends DefaultTask {
   }
 
   @inline def addDependency(library: LauncherLibrary) = this.dependencies.add(library)
+  @inline def addDependency(library: String): Unit = this.addDependency(new LauncherLibrary(library))
+  @inline def addDependency(library: String, url: String): Unit = this.addDependency(new LauncherLibrary(library, url))
   @inline def getFmlJson = this.fmlJson
   @inline def getDestination = this.destination
   @inline def setFmlJson(fmlJson: DelayedString) = this.fmlJson = fmlJson
