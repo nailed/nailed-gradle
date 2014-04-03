@@ -32,7 +32,6 @@ dependencies {
     compile gradleApi()
 
     compile 'org.scala-lang:scala-library:2.10.4'
-    compile 'org.projectlombok:lombok:1.12.2'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.jcraft:jsch:0.1.50'
 
