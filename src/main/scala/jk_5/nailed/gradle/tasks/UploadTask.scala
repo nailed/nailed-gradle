@@ -3,12 +3,10 @@ package jk_5.nailed.gradle.tasks
 import org.gradle.api.DefaultTask
 import jk_5.nailed.gradle.delayed.{DelayedString, DelayedFile}
 import jk_5.nailed.gradle.extension.NailedExtension
-import jk_5.nailed.gradle.Constants
 import java.io.FileInputStream
-import org.apache.tools.ant.filters.StringInputStream
 import org.gradle.api.tasks.TaskAction
 import jk_5.nailed.gradle.common.{SshUtils, SshConnectionPool}
-import jk_5.nailed.gradle.json.{Serialization, Library, LibraryList, RestartLevel}
+import jk_5.nailed.gradle.json.{Library, RestartLevel}
 
 /**
  * No description given
@@ -24,33 +22,24 @@ class UploadTask extends DefaultTask {
   private var artifact: DelayedString = null
   private var restart = RestartLevel.NOTHING
   private var mod = false
+  private var updateTask: UpdateRemoteLibraryList = null
 
   @TaskAction def doTask(){
     val ext = NailedExtension.getInstance(this.getProject)
     val sftp = SshConnectionPool.getConnection(this.getProject)
 
     SshUtils.cd(sftp, this.remoteDir.call)
-
     sftp.put(new FileInputStream(this.getUploadFile.call), this.remoteFile.call)
-    sftp.cd(sftp.getHome)
-    sftp.cd(ext.getRemoteProfileDir)
 
-    val libList = LibraryList.readFromStream(sftp.get(Constants.REMOTE_VERSION_FILE))
-    val libOption = libList.getArtifact(this.artifact.call)
-    libList.tweakers = ext.getTweakers
-    if(libOption.isEmpty){
-      val l = new Library
-      l.name = this.artifact.call
-      libList.libraries.add(l)
-    }
-    val lib = libList.getArtifact(this.artifact.call).get
-    lib.rev += 1
+    SshConnectionPool.cleanup()
+
+    val lib = new Library
     lib.destination = this.destination.call
     lib.location = ext.getLoadingMavenUrl + this.remoteDir.call + "/" + this.remoteFile.call
     lib.restart = this.restart
     lib.mod = this.mod
-    sftp.put(new StringInputStream(Serialization.gson.toJson(libList)), Constants.REMOTE_VERSION_FILE)
-    SshConnectionPool.cleanup()
+    lib.name = this.artifact.call
+    this.updateTask.updateLibrary(lib)
   }
 
   @inline def getUploadFile = this.uploadFile
@@ -68,4 +57,5 @@ class UploadTask extends DefaultTask {
   @inline def setArtifact(artifact: DelayedString) = this.artifact = artifact
   @inline def setRestart(restart: RestartLevel) = this.restart = restart
   @inline def setIsMod(isMod: Boolean) = this.mod = isMod
+  @inline def setUpdateTask(updateTask: UpdateRemoteLibraryList) = this.updateTask = updateTask
 }

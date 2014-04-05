@@ -59,9 +59,8 @@ trait BasePlugin extends Plugin[Project] {
     this.getProject.task(map, name).asInstanceOf[T]
   }
 
-  implicit def stringToDelayedString(input: String): DelayedString = this.delayedString(input)
-  implicit def stringToDelayedFile(input: String): DelayedFile = this.delayedFile(input)
-
+  @inline implicit def stringToDelayedString(input: String): DelayedString = this.delayedString(input)
+  @inline implicit def stringToDelayedFile(input: String): DelayedFile = this.delayedFile(input)
   @inline protected def delayedString(path: String) = new DelayedString(project, path)
   @inline protected def delayedFile(path: String) = new DelayedFile(project, path)
   @inline protected def delayedFileTree(path: String) = new DelayedFileTree(project, path)
