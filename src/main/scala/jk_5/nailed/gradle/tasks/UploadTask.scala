@@ -42,7 +42,7 @@ class UploadTask extends DefaultTask {
     lib.mod = this.mod
     lib.load = this.load
     lib.name = this.artifact.call
-    lib.coremod = this.coremod.call
+    lib.coremod = if(this.coremod == null) null else this.coremod.call
     this.updateTask.updateLibrary(lib)
   }
 

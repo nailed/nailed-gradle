@@ -60,7 +60,7 @@ class NailedExtension(val project: Project) {
     val name = data.get("project").toString
     val mod = Option(data.get("mod")).getOrElse(false).toString.toBoolean
     val load = Option(data.get("load")).getOrElse(false).toString.toBoolean
-    val coremod = data.get("coremod").toString
-    this.deployed.add(new DeployedArtifact(name, mod, load, coremod))
+    val coremod = data.get("coremod")
+    this.deployed.add(new DeployedArtifact(name, mod, load, if(coremod != null) coremod.toString else null))
   }
 }
