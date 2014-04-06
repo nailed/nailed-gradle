@@ -3,6 +3,7 @@ package jk_5.nailed.gradle.extension
 import java.util
 import org.gradle.api.Project
 import jk_5.nailed.gradle.common.DeployedArtifact
+import jk_5.nailed.gradle.json.RestartLevel
 
 /**
  * No description given
@@ -60,7 +61,9 @@ class NailedExtension(val project: Project) {
     val name = data.get("project").toString
     val mod = Option(data.get("mod")).getOrElse(false).toString.toBoolean
     val load = Option(data.get("load")).getOrElse(false).toString.toBoolean
+    val reobf = Option(data.get("reobf")).getOrElse(false).toString.toBoolean
     val coremod = data.get("coremod")
-    this.deployed.add(new DeployedArtifact(name, mod, load, if(coremod != null) coremod.toString else null))
+    val restart = RestartLevel.valueOf(Option(data.get("restart")).getOrElse("nothing").toString.toUpperCase)
+    this.deployed.add(new DeployedArtifact(name, mod, load, if(coremod != null) coremod.toString else null), reobf, restart)
   }
 }

@@ -74,13 +74,12 @@ class NailedPlugin extends BasePlugin {
     ext.getDeployed.foreach(p => {
       val task = this.makeTask("deploy" + p.name, classOf[DeploySubprojectTask])
       task.setSubProject(this.getProject.getSubprojects.find(_.getName == p.name).get)
-      if(p.mod){
+      if(p.reobf){
         task.dependsOn("build")
-        task.setRestart(RestartLevel.NOTHING)
       }else{
         task.dependsOn(p.name + ":build")
-        task.setRestart(RestartLevel.GAME)
       }
+      task.setRestart(p.restart)
       task.setIsMod(p.mod)
       task.setLoad(p.load)
       task.setCoremod(p.coremod)
