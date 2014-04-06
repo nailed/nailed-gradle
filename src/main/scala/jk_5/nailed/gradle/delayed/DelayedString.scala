@@ -13,6 +13,6 @@ class DelayedString(owner: Project, pattern: String) extends DelayedBase[String]
     if(this.resolved.isEmpty){
       this.resolved = Option(DelayedBase.resolve(pattern, project))
     }
-    this.resolved.get
+    this.resolved.getOrElse(null)
   }
 }

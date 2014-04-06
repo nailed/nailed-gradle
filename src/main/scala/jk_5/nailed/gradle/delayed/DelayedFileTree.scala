@@ -14,6 +14,6 @@ class DelayedFileTree(owner: Project, pattern: String) extends DelayedBase[FileT
     if(this.resolved.isEmpty){
       this.resolved = Option(project.fileTree(DelayedBase.resolve(pattern, project)))
     }
-    this.resolved.get
+    this.resolved.getOrElse(null)
   }
 }

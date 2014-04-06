@@ -14,6 +14,6 @@ class DelayedFile(owner: Project, pattern: String) extends DelayedBase[File](own
     if(this.resolved.isEmpty){
       this.resolved = Option(project.file(DelayedBase.resolve(pattern, project)))
     }
-    this.resolved.get
+    this.resolved.getOrElse(null)
   }
 }
