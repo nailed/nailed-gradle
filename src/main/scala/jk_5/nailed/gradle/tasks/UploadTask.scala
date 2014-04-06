@@ -20,6 +20,7 @@ class UploadTask extends DefaultTask {
   private var remoteFile: DelayedString = null
   private var destination: DelayedString = null
   private var artifact: DelayedString = null
+  private var coremod: DelayedString = null
   private var restart = RestartLevel.NOTHING
   private var mod = false
   private var load = false
@@ -41,6 +42,7 @@ class UploadTask extends DefaultTask {
     lib.mod = this.mod
     lib.load = this.load
     lib.name = this.artifact.call
+    lib.coremod = this.coremod.call
     this.updateTask.updateLibrary(lib)
   }
 
@@ -50,6 +52,7 @@ class UploadTask extends DefaultTask {
   @inline def getDestination = this.destination
   @inline def getArtifact = this.artifact
   @inline def getRestart = this.restart
+  @inline def getCoremod = this.coremod
   @inline def isMod = this.mod
   @inline def isLoad = this.load
 
@@ -62,4 +65,5 @@ class UploadTask extends DefaultTask {
   @inline def setIsMod(isMod: Boolean) = this.mod = isMod
   @inline def setUpdateTask(updateTask: UpdateRemoteLibraryList) = this.updateTask = updateTask
   @inline def setLoad(load: Boolean) = this.load = load
+  @inline def setCoremod(coremod: DelayedString) = this.coremod = coremod
 }

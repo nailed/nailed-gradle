@@ -83,6 +83,7 @@ class NailedPlugin extends BasePlugin {
       }
       task.setIsMod(p.mod)
       task.setLoad(p.load)
+      task.setCoremod(p.coremod)
       task.setDestination("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar")
       task.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
       task.setUpdateTask(this.updateLibraryListTask)

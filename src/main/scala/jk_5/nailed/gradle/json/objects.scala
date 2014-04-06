@@ -18,6 +18,7 @@ class Library {
   var restart = RestartLevel.NOTHING
   var mod = false
   var load = false
+  var coremod: String = null
 }
 
 class LibraryList {

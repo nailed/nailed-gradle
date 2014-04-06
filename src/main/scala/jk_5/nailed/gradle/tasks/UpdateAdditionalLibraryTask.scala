@@ -15,6 +15,7 @@ class UpdateAdditionalLibraryTask extends DefaultTask {
   private var destination: DelayedString = null
   private var location: DelayedString = null
   private var artifact: DelayedString = null
+  private var coremod: DelayedString = null
   private var restart = RestartLevel.NOTHING
   private var load = false
   private var updateTask: UpdateRemoteLibraryList = null
@@ -27,6 +28,7 @@ class UpdateAdditionalLibraryTask extends DefaultTask {
     lib.mod = false
     lib.load = this.load
     lib.name = this.artifact.call
+    lib.coremod = this.coremod.call
     this.updateTask.updateLibrary(lib)
   }
 
@@ -34,6 +36,7 @@ class UpdateAdditionalLibraryTask extends DefaultTask {
   @inline def getLocation = this.location
   @inline def getArtifact = this.artifact
   @inline def getRestart = this.restart
+  @inline def getCoremod = this.coremod
   @inline def isLoad = this.load
 
   @inline def setDestination(destination: DelayedString) = this.destination = destination
@@ -42,4 +45,5 @@ class UpdateAdditionalLibraryTask extends DefaultTask {
   @inline def setRestart(restart: RestartLevel) = this.restart = restart
   @inline def setUpdateTask(updateTask: UpdateRemoteLibraryList) = this.updateTask = updateTask
   @inline def setLoad(load: Boolean) = this.load = load
+  @inline def setCoremod(coremod: DelayedString) = this.coremod = coremod
 }

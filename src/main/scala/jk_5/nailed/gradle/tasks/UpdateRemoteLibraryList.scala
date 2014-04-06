@@ -39,6 +39,7 @@ class UpdateRemoteLibraryList extends DefaultTask {
         l.restart = library.restart
         l.mod = library.mod
         l.load = library.load
+        l.coremod = library.coremod
       }
     })
     this.libraryList.tweakers = ext.getTweakers
