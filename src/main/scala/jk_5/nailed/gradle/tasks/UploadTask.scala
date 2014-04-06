@@ -22,6 +22,7 @@ class UploadTask extends DefaultTask {
   private var artifact: DelayedString = null
   private var restart = RestartLevel.NOTHING
   private var mod = false
+  private var load = false
   private var updateTask: UpdateRemoteLibraryList = null
 
   @TaskAction def doTask(){
@@ -38,6 +39,7 @@ class UploadTask extends DefaultTask {
     lib.location = ext.getLoadingMavenUrl + this.remoteDir.call + "/" + this.remoteFile.call
     lib.restart = this.restart
     lib.mod = this.mod
+    lib.load = this.load
     lib.name = this.artifact.call
     this.updateTask.updateLibrary(lib)
   }
@@ -49,6 +51,7 @@ class UploadTask extends DefaultTask {
   @inline def getArtifact = this.artifact
   @inline def getRestart = this.restart
   @inline def isMod = this.mod
+  @inline def isLoad = this.load
 
   @inline def setUploadFile(uploadFile: DelayedFile) = this.uploadFile = uploadFile
   @inline def setRemoteDir(remoteDir: DelayedString) = this.remoteDir = remoteDir
@@ -58,4 +61,5 @@ class UploadTask extends DefaultTask {
   @inline def setRestart(restart: RestartLevel) = this.restart = restart
   @inline def setIsMod(isMod: Boolean) = this.mod = isMod
   @inline def setUpdateTask(updateTask: UpdateRemoteLibraryList) = this.updateTask = updateTask
+  @inline def setLoad(load: Boolean) = this.load = load
 }

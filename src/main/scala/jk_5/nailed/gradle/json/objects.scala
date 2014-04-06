@@ -17,6 +17,7 @@ class Library {
   var location: String = _
   var restart = RestartLevel.NOTHING
   var mod = false
+  var load = false
 }
 
 class LibraryList {

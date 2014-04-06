@@ -72,20 +72,18 @@ class NailedPlugin extends BasePlugin {
   override def afterEvaluate(){
     val ext = NailedExtension.getInstance(this.getProject)
     ext.getDeployed.foreach(p => {
-      val task = this.makeTask("deploy" + p.getName, classOf[DeploySubprojectTask])
-      task.setSubProject(p)
-      task.dependsOn(p.getName + ":build")
+      val task = this.makeTask("deploy" + p.name, classOf[DeploySubprojectTask])
+      task.setSubProject(this.getProject.getSubprojects.find(_.getName == p.name).get)
+      if(p.mod){
+        task.dependsOn("build")
+        task.setRestart(RestartLevel.NOTHING)
+      }else{
+        task.dependsOn(p.name + ":build")
+        task.setRestart(RestartLevel.GAME)
+      }
+      task.setIsMod(p.mod)
+      task.setLoad(p.load)
       task.setDestination("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar")
-      task.setRestart(RestartLevel.GAME)
-      task.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
-      task.setUpdateTask(this.updateLibraryListTask)
-    })
-    ext.getDeployedMods.foreach(p => {
-      val task = this.makeTask("deploy" + p.getName, classOf[DeploySubprojectTask])
-      task.setSubProject(p)
-      task.dependsOn("build")
-      task.setDestination("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar")
-      task.setIsMod(isMod = true)
       task.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
       task.setUpdateTask(this.updateLibraryListTask)
     })

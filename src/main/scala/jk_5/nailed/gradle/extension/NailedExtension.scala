@@ -2,7 +2,7 @@ package jk_5.nailed.gradle.extension
 
 import java.util
 import org.gradle.api.Project
-import scala.collection.JavaConversions._
+import jk_5.nailed.gradle.common.DeployedArtifact
 
 /**
  * No description given
@@ -26,9 +26,8 @@ class NailedExtension(val project: Project) {
   private var remoteProfileDir: String = ""
   private val tweakers = new util.ArrayList[String]
   private val launcherTweakers = new util.ArrayList[String]
-  private val deployed = new util.ArrayList[Project]
-  private val deployedMods = new util.ArrayList[Project]
   private val additionalLibs = new util.ArrayList[String]
+  private val deployed = new util.ArrayList[DeployedArtifact]
 
   @inline def getMinecraftVersion = this.minecraftVersion
   @inline def getForgeVersion = this.forgeVersion
@@ -42,7 +41,6 @@ class NailedExtension(val project: Project) {
   @inline def getTweakers = this.tweakers
   @inline def getLauncherTweakers = this.launcherTweakers
   @inline def getDeployed = this.deployed
-  @inline def getDeployedMods = this.deployedMods
   @inline def getAdditionalLibs = this.additionalLibs
 
   @inline def setMinecraftVersion(minecraftVersion: String) = this.minecraftVersion = minecraftVersion
@@ -56,7 +54,12 @@ class NailedExtension(val project: Project) {
   @inline def setRemoteProfileDir(remoteProfileDir: String) = this.remoteProfileDir = remoteProfileDir
   @inline def setTweaker(tweaker: String) = this.tweakers.add(tweaker)
   @inline def setLauncherTweaker(launcherTweaker: String) = this.launcherTweakers.add(launcherTweaker)
-  @inline def setDeployed(deployed: String) = this.project.getSubprojects.filter(_.getName == deployed).foreach(this.deployed.add)
-  @inline def setDeployedMod(deployedMod: String) = this.project.getSubprojects.filter(_.getName == deployedMod).foreach(this.deployedMods.add)
   @inline def setAdditionalLib(additionalLib: String) = this.additionalLibs.add(additionalLib)
+
+  def setDeploy(data: util.Map[String, AnyRef]){
+    val name = data.get("project").toString
+    val mod = Option(data.get("mod")).getOrElse(false).toString.toBoolean
+    val load = Option(data.get("load")).getOrElse(false).toString.toBoolean
+    this.deployed.add(new DeployedArtifact(name, mod, load))
+  }
 }
