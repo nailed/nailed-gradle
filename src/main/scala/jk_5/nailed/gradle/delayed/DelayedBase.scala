@@ -14,6 +14,7 @@ object DelayedBase {
   def resolve(p: String, project: Project): String = {
     var pattern = p
     project.getLogger.info("Resolving: " + pattern, null, null)
+    if(p == null) return null
     var build: String = "0"
     if (System.getenv.containsKey("BUILD_NUMBER")) {
       build = System.getenv("BUILD_NUMBER")
