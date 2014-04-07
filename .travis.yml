@@ -1,0 +1,6 @@
+language: java
+notifications:
+  webhooks:
+  - http://n.tkte.ch/h/2311/PPLT4HDneFASu498TEmN6_ph
+  email: false
+script: TERM=dumb ./gradlew check
