@@ -16,13 +16,13 @@ import groovy.lang.Closure
  *
  * @author jk-5
  */
-class UpdateRemoteLibraryList extends DefaultTask {
+class UpdateRemoteLibraryListTask extends DefaultTask {
 
   private var updated = mutable.ArrayBuffer[Library]()
   private var libraryList: LibraryList = _
 
   this.onlyIf(new Closure[Boolean](this, this){
-    override def call(args: AnyRef*) = args(0).asInstanceOf[UpdateRemoteLibraryList].updated.size > 0
+    override def call(args: AnyRef*) = args(0).asInstanceOf[UpdateRemoteLibraryListTask].updated.size > 0
   })
 
   @TaskAction def doTask(){

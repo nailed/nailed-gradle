@@ -2,7 +2,7 @@ package jk_5.nailed.gradle.extension
 
 import java.util
 import org.gradle.api.Project
-import jk_5.nailed.gradle.common.DeployedArtifact
+import jk_5.nailed.gradle.common.{UpdaterArtifact, MavenArtifact, DeployedArtifact}
 import jk_5.nailed.gradle.json.RestartLevel
 
 /**
@@ -28,7 +28,7 @@ class NailedExtension(val project: Project) {
   private val tweakers = new util.ArrayList[String]
   private val launcherTweakers = new util.ArrayList[String]
   private val additionalLibs = new util.ArrayList[String]
-  private val deployed = new util.ArrayList[DeployedArtifact]
+  private val deployed = new util.ArrayList[UpdaterArtifact]
 
   @inline def getMinecraftVersion = this.minecraftVersion
   @inline def getForgeVersion = this.forgeVersion
@@ -58,12 +58,28 @@ class NailedExtension(val project: Project) {
   @inline def setAdditionalLib(additionalLib: String) = this.additionalLibs.add(additionalLib)
 
   def setDeploy(data: util.Map[String, AnyRef]){
-    val name = data.get("project").toString
-    val mod = Option(data.get("mod")).getOrElse(false).toString.toBoolean
-    val load = Option(data.get("load")).getOrElse(false).toString.toBoolean
-    val reobf = Option(data.get("reobf")).getOrElse(false).toString.toBoolean
-    val coremod = data.get("coremod")
-    val restart = RestartLevel.valueOf(Option(data.get("restart")).getOrElse("nothing").toString.toUpperCase)
-    this.deployed.add(new DeployedArtifact(name, mod, load, if(coremod != null) coremod.toString else null), reobf, restart)
+    if(data.containsKey("project")){
+      val d = new DeployedArtifact
+      d.artifact = data.get("artifact").toString
+      d.projectName = data.get("project").toString
+      d.mod = Option(data.get("mod")).getOrElse(false).toString.toBoolean
+      d.load = Option(data.get("load")).getOrElse(false).toString.toBoolean
+      d.reobf = Option(data.get("reobf")).getOrElse(false).toString.toBoolean
+      d.coremod = if(data.containsKey("coremod")) data.get("coremod").toString else null
+      d.restart = RestartLevel.valueOf(Option(data.get("restart")).getOrElse("nothing").toString.toUpperCase)
+      this.deployed.add(d)
+    }else if(data.containsKey("maven")){
+      val d = new MavenArtifact
+      d.artifact = data.get("artifact").toString
+      d.mavenPath = data.get("maven").toString
+      d.localMavenPath = if(data.containsKey("localmaven")) data.get("localmaven").toString else null
+      d.mavenServer = data.get("server").toString
+      d.mod = Option(data.get("mod")).getOrElse(false).toString.toBoolean
+      d.load = Option(data.get("load")).getOrElse(false).toString.toBoolean
+      d.reobf = Option(data.get("reobf")).getOrElse(false).toString.toBoolean
+      d.coremod = if(data.containsKey("coremod")) data.get("coremod").toString else null
+      d.restart = RestartLevel.valueOf(Option(data.get("restart")).getOrElse("nothing").toString.toUpperCase)
+      this.deployed.add(d)
+    }
   }
 }

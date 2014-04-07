@@ -1,6 +1,6 @@
 package jk_5.nailed.gradle
 
-import jk_5.nailed.gradle.common.{SshConnectionPool, BasePlugin}
+import jk_5.nailed.gradle.common.{MavenArtifact, DeployedArtifact, SshConnectionPool, BasePlugin}
 import scala.util.Properties
 import jk_5.nailed.gradle.tasks._
 import jk_5.nailed.gradle.extension.NailedExtension
@@ -34,7 +34,7 @@ object Constants {
 
 class NailedPlugin extends BasePlugin {
 
-  var updateLibraryListTask: UpdateRemoteLibraryList = _
+  var updateLibraryListTask: UpdateRemoteLibraryListTask = _
 
   override def applyPlugin(){
     this.getProject.getGradle.addBuildListener(new BuildListener {
@@ -50,14 +50,14 @@ class NailedPlugin extends BasePlugin {
     this.getProject.getExtensions.create(Constants.NAILED_EXTENSION, classOf[NailedExtension], this.getProject)
 
     val loadLibraryListTask = this.makeTask("loadLibraryList", classOf[LoadRemoteLibraryListTask])
-    this.updateLibraryListTask = this.makeTask("updateLibraryList", classOf[UpdateRemoteLibraryList])
+    this.updateLibraryListTask = this.makeTask("updateLibraryList", classOf[UpdateRemoteLibraryListTask])
     this.updateLibraryListTask.dependsOn("loadLibraryList")
     loadLibraryListTask.setUpdateTask(this.updateLibraryListTask)
 
     val launcherProfileTask = this.makeTask("createLauncherProfile", classOf[CreateLauncherProfileTask])
     launcherProfileTask.setDestination(Constants.PROFILE_LOCATION)
     launcherProfileTask.setFmlJson(Constants.FML_JSON_URL)
-    val uploadProfileTask = this.makeTask("deployLauncherProfile", classOf[UploadTask])
+    val uploadProfileTask = this.makeTask("uploadLauncherProfile", classOf[UploadTask])
     uploadProfileTask.setRemoteDir("{REMOTE_DATA_DIR}")
     uploadProfileTask.setRemoteFile("launcherProfile.json")
     uploadProfileTask.setUploadFile(Constants.PROFILE_LOCATION)
@@ -65,29 +65,51 @@ class NailedPlugin extends BasePlugin {
     uploadProfileTask.setArtifact("launcherProfile")
     uploadProfileTask.setRestart(RestartLevel.LAUNCHER)
     uploadProfileTask.dependsOn("createLauncherProfile")
-    uploadProfileTask.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
-    uploadProfileTask.setUpdateTask(this.updateLibraryListTask)
+    uploadProfileTask.setFinalizedBy(ImmutableSet.of("updateLauncherProfile"))
+    val updateTask = this.makeTask("updateLauncherProfile", classOf[UpdateLibraryTask])
+    updateTask.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
+    updateTask.setUpdateTask(this.updateLibraryListTask)
+    uploadProfileTask.setUpdateTask(updateTask)
   }
 
   override def afterEvaluate(){
     val ext = NailedExtension.getInstance(this.getProject)
-    ext.getDeployed.foreach(p => {
-      val task = this.makeTask("deploy" + p.name, classOf[DeploySubprojectTask])
-      task.setSubProject(this.getProject.getSubprojects.find(_.getName == p.name).get)
-      if(p.reobf){
-        task.dependsOn("build")
-      }else{
-        task.dependsOn(p.name + ":build")
-      }
-      task.setRestart(p.restart)
-      task.setIsMod(p.mod)
-      task.setLoad(p.load)
-      task.setCoremod(p.coremod)
-      task.setDestination("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar")
-      task.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
-      task.setUpdateTask(this.updateLibraryListTask)
-    })
-    val updateForgeTask = this.makeTask("updateForge", classOf[UpdateAdditionalLibraryTask])
+    for(pt <- ext.getDeployed) pt match {
+      case p: DeployedArtifact =>
+        val updateTask = this.makeTask("update" + p.projectName, classOf[UpdateLibraryTask])
+        updateTask.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
+        updateTask.setUpdateTask(this.updateLibraryListTask)
+        val task = this.makeTask("upload" + p.projectName, classOf[UploadSubprojectTask])
+        val proj = this.getProject.getSubprojects.find(_.getName == p.projectName).get
+        task.setSubProject(proj)
+        if(p.reobf){
+          task.dependsOn("build")
+        }else{
+          task.dependsOn(p.projectName + ":build")
+        }
+        task.setArtifact(p.artifact)
+        task.setRestart(p.restart)
+        task.setIsMod(p.mod)
+        task.setLoad(p.load)
+        task.setCoremod(p.coremod)
+        task.setDestination("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar")
+        task.setFinalizedBy(ImmutableSet.of("update" + p.projectName))
+        task.setUpdateTask(updateTask)
+      case p: MavenArtifact =>
+        val task = this.makeTask("update" + this.startUppercase(p.artifact), classOf[UpdateLibraryTask])
+        if(p.localMavenPath == null){
+          task.setDestination("{MC_LIB_DIR}/" + this.parseMavenPath(p.mavenPath, classifier = false))
+        }else{
+          task.setDestination("{MC_LIB_DIR}/" + this.parseMavenPath(p.localMavenPath, classifier = false))
+        }
+        task.setLocation(p.mavenServer + this.parseMavenPath(p.mavenPath))
+        task.setArtifact(p.artifact)
+        task.setRestart(p.restart)
+        task.setUpdateTask(this.updateLibraryListTask)
+        task.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
+        task.setLoad(p.load)
+    }
+    /*val updateForgeTask = this.makeTask("updateForge", classOf[UpdateAdditionalLibraryTask])
     updateForgeTask.setDestination("{MC_LIB_DIR}/net/minecraftforge/forge/{MC_VERSION}-{FORGE_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}.jar")
     updateForgeTask.setLocation("http://files.minecraftforge.net/maven/net/minecraftforge/forge/{MC_VERSION}-{FORGE_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}-universal.jar")
     updateForgeTask.setArtifact("forge")
@@ -102,6 +124,31 @@ class NailedPlugin extends BasePlugin {
     updateMCTask.setArtifact("minecraft")
     updateMCTask.setRestart(RestartLevel.NOTHING)
     updateMCTask.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
-    updateMCTask.setUpdateTask(this.updateLibraryListTask)
+    updateMCTask.setUpdateTask(this.updateLibraryListTask)*/
   }
+
+  def parseMavenPath(in: String, classifier: Boolean = true): String = {
+    val extp = in.split("@", 2)
+    val ext = if(extp.length == 2) extp(1) else "jar"
+    val parts = in.split(":")
+    val group = parts(0).replace('.', '/')
+    val name = parts(1)
+    val version = parts(2)
+    var ret = group + "/"
+    if(!name.isEmpty){
+      ret += name + "/"
+    }
+    ret += version + "/"
+    if(!name.isEmpty){
+      ret += name + "-"
+    }
+    ret += version
+    if(parts.length == 4 && classifier){
+      ret += "-" + parts(3)
+    }
+    ret += "." + ext
+    ret
+  }
+
+  def startUppercase(in: String) = Character.toUpperCase(in.charAt(0)) + in.substring(1)
 }

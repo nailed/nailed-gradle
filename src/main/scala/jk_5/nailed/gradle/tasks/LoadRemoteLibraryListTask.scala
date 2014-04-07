@@ -14,7 +14,7 @@ import jk_5.nailed.gradle.json.{LibraryList, Serialization}
  */
 class LoadRemoteLibraryListTask extends DefaultTask {
 
-  private var updateTask: UpdateRemoteLibraryList = _
+  private var updateTask: UpdateRemoteLibraryListTask = _
 
   @TaskAction def doTask(){
     val sftp = SshConnectionPool.getConnection(this.getProject)
@@ -26,5 +26,5 @@ class LoadRemoteLibraryListTask extends DefaultTask {
     SshConnectionPool.cleanup()
   }
 
-  def setUpdateTask(updateTask: UpdateRemoteLibraryList) = this.updateTask = updateTask
+  def setUpdateTask(updateTask: UpdateRemoteLibraryListTask) = this.updateTask = updateTask
 }

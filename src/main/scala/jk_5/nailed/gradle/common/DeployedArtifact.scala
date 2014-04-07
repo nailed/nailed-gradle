@@ -8,10 +8,23 @@ import jk_5.nailed.gradle.json.RestartLevel
  * @author jk-5
  */
 case class DeployedArtifact(
-  var name: String,
-  var mod: Boolean,
-  var load: Boolean,
-  var coremod: String,
+  var artifact: String = null,
+  var projectName: String = null,
+  var mod: Boolean = false,
+  var load: Boolean = false,
+  var coremod: String = null,
   var reobf: Boolean = false,
-  var restart: RestartLevel
-)
+  var restart: RestartLevel = RestartLevel.NOTHING
+) extends UpdaterArtifact
+case class MavenArtifact(
+  var artifact: String = null,
+  var mavenServer: String = null,
+  var mavenPath: String = null,
+  var localMavenPath: String = null,
+  var mod: Boolean = false,
+  var load: Boolean = false,
+  var coremod: String = null,
+  var reobf: Boolean = false,
+  var restart: RestartLevel = RestartLevel.NOTHING
+) extends UpdaterArtifact
+trait UpdaterArtifact

@@ -6,7 +6,7 @@ import jk_5.nailed.gradle.extension.NailedExtension
 import java.io.FileInputStream
 import org.gradle.api.tasks.TaskAction
 import jk_5.nailed.gradle.common.{SshUtils, SshConnectionPool}
-import jk_5.nailed.gradle.json.{Library, RestartLevel}
+import jk_5.nailed.gradle.json.RestartLevel
 
 /**
  * No description given
@@ -24,7 +24,7 @@ class UploadTask extends DefaultTask {
   private var restart = RestartLevel.NOTHING
   private var mod = false
   private var load = false
-  private var updateTask: UpdateRemoteLibraryList = null
+  private var updateTask: UpdateLibraryTask = null
 
   @TaskAction def doTask(){
     val ext = NailedExtension.getInstance(this.getProject)
@@ -35,15 +35,15 @@ class UploadTask extends DefaultTask {
 
     SshConnectionPool.cleanup()
 
-    val lib = new Library
-    lib.destination = this.destination.call
-    lib.location = ext.getLoadingMavenUrl + this.remoteDir.call + "/" + this.remoteFile.call
-    lib.restart = this.restart
-    lib.mod = this.mod
-    lib.load = this.load
-    lib.name = this.artifact.call
-    lib.coremod = if(this.coremod == null) null else this.coremod.call
-    this.updateTask.updateLibrary(lib)
+    if(this.updateTask != null){
+      this.updateTask.setDestination(this.destination)
+      this.updateTask.setLocation(new DelayedString(this.getProject, ext.getLoadingMavenUrl + this.remoteDir.call + "/" + this.remoteFile.call))
+      this.updateTask.setRestart(this.restart)
+      this.updateTask.setMod(this.mod)
+      this.updateTask.setLoad(this.load)
+      this.updateTask.setCoremod(this.coremod)
+      this.updateTask.setArtifact(this.artifact)
+    }
   }
 
   @inline def getUploadFile = this.uploadFile
@@ -63,7 +63,8 @@ class UploadTask extends DefaultTask {
   @inline def setArtifact(artifact: DelayedString) = this.artifact = artifact
   @inline def setRestart(restart: RestartLevel) = this.restart = restart
   @inline def setIsMod(isMod: Boolean) = this.mod = isMod
-  @inline def setUpdateTask(updateTask: UpdateRemoteLibraryList) = this.updateTask = updateTask
+  //@inline def setUpdateTask(updateTask: UpdateRemoteLibraryList) = this.updateTask = updateTask
   @inline def setLoad(load: Boolean) = this.load = load
   @inline def setCoremod(coremod: DelayedString) = this.coremod = coremod
+  @inline def setUpdateTask(updateTask: UpdateLibraryTask) = this.updateTask = updateTask
 }
