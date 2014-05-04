@@ -21,10 +21,8 @@ object DelayedBase {
     }
     val ext: NailedExtension = NailedExtension.getInstance(project)
     pattern = pattern.replace("{MC_VERSION}", ext.getMinecraftVersion)
-    pattern = pattern.replace("{FORGE_VERSION}", ext.getForgeVersion)
     pattern = pattern.replace("{CACHE_DIR}", project.getGradle.getGradleUserHomeDir.getAbsolutePath.replace('\\', '/') + "/caches/nailed-forge")
     pattern = pattern.replace("{BUILD_DIR}", project.getBuildDir.getAbsolutePath.replace('\\', '/'))
-    pattern = pattern.replace("{BUILD_NUM}", build)
     pattern = pattern.replace("{PROJECT}", project.getName)
     pattern = pattern.replace("{VERSION}", project.getVersion.toString)
     pattern = pattern.replace("{GROUP_ID}", project.getGroup.toString)

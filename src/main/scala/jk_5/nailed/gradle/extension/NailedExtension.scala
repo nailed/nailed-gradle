@@ -17,7 +17,6 @@ object NailedExtension {
 class NailedExtension(val project: Project) {
 
   private var minecraftVersion: String = null
-  private var forgeVersion: String = null
   private var versionName: String = "Nailed"
   private var loadingMavenUrl: String = "http://maven.reening.nl/"
   private var mainClass: String = null
@@ -26,12 +25,9 @@ class NailedExtension(val project: Project) {
   private var deployPassword: String = null
   private var remoteProfileDir: String = ""
   private val tweakers = new util.ArrayList[String]
-  private val launcherTweakers = new util.ArrayList[String]
-  private val additionalLibs = new util.ArrayList[String]
   private val deployed = new util.ArrayList[UpdaterArtifact]
 
   @inline def getMinecraftVersion = this.minecraftVersion
-  @inline def getForgeVersion = this.forgeVersion
   @inline def getVersionName = this.versionName
   @inline def getLoadingMavenUrl = this.loadingMavenUrl
   @inline def getMainClass = this.mainClass
@@ -40,12 +36,9 @@ class NailedExtension(val project: Project) {
   @inline def getDeployPassword = this.deployPassword
   @inline def getRemoteProfileDir = this.remoteProfileDir
   @inline def getTweakers = this.tweakers
-  @inline def getLauncherTweakers = this.launcherTweakers
   @inline def getDeployed = this.deployed
-  @inline def getAdditionalLibs = this.additionalLibs
 
   @inline def setMinecraftVersion(minecraftVersion: String) = this.minecraftVersion = minecraftVersion
-  @inline def setForgeVersion(forgeVersion: String) = this.forgeVersion = forgeVersion
   @inline def setVersionName(versionName: String) = this.versionName = versionName
   @inline def setLoadingMavenUrl(loadingMavenUrl: String) = this.loadingMavenUrl = loadingMavenUrl
   @inline def setMainClass(mainClass: String) = this.mainClass = mainClass
@@ -54,8 +47,6 @@ class NailedExtension(val project: Project) {
   @inline def setDeployPassword(deployPassword: String) = this.deployPassword = deployPassword
   @inline def setRemoteProfileDir(remoteProfileDir: String) = this.remoteProfileDir = remoteProfileDir
   @inline def setTweaker(tweaker: String) = this.tweakers.add(tweaker)
-  @inline def setLauncherTweaker(launcherTweaker: String) = this.launcherTweakers.add(launcherTweaker)
-  @inline def setAdditionalLib(additionalLib: String) = this.additionalLibs.add(additionalLib)
 
   def setDeploy(data: util.Map[String, AnyRef]){
     if(data.containsKey("project")){
@@ -67,6 +58,7 @@ class NailedExtension(val project: Project) {
       d.reobf = Option(data.get("reobf")).getOrElse(false).toString.toBoolean
       d.coremod = if(data.containsKey("coremod")) data.get("coremod").toString else null
       d.restart = RestartLevel.valueOf(Option(data.get("restart")).getOrElse("nothing").toString.toUpperCase)
+      d.mclib = Option(data.get("mclib")).getOrElse(false).toString.toBoolean
       this.deployed.add(d)
     }else if(data.containsKey("maven")){
       val d = new MavenArtifact
@@ -79,6 +71,7 @@ class NailedExtension(val project: Project) {
       d.reobf = Option(data.get("reobf")).getOrElse(false).toString.toBoolean
       d.coremod = if(data.containsKey("coremod")) data.get("coremod").toString else null
       d.restart = RestartLevel.valueOf(Option(data.get("restart")).getOrElse("nothing").toString.toUpperCase)
+      d.mclib = Option(data.get("mclib")).getOrElse(false).toString.toBoolean
       this.deployed.add(d)
     }
   }

@@ -23,6 +23,7 @@ class CreateLauncherProfileTask extends DefaultTask {
   private var fmlJson: DelayedString = null
   private var destination: DelayedFile = null
   private val dependencies = new util.ArrayList[LauncherLibrary]
+  private val tweakers = new util.ArrayList[String]
 
   @TaskAction def doTask(){
     val ext = NailedExtension.getInstance(getProject)
@@ -48,7 +49,7 @@ class CreateLauncherProfileTask extends DefaultTask {
     })
 
     val argsBuilder = new StringBuilder(fmlProfile.minecraftArguments.split(" --tweakClass ", 2)(0))
-    ext.getLauncherTweakers.foreach(t => argsBuilder.append(" --tweakClass ").append(t))
+    this.tweakers.foreach(t => argsBuilder.append(" --tweakClass ").append(t))
 
     newProfile.id = ext.getVersionName
     newProfile.mainClass = ext.getMainClass
@@ -66,9 +67,11 @@ class CreateLauncherProfileTask extends DefaultTask {
     writer.close()
   }
 
-  @inline def addDependency(library: LauncherLibrary) = this.dependencies.add(library)
-  @inline def addDependency(library: String): Unit = this.addDependency(new LauncherLibrary(library))
-  @inline def addDependency(library: String, url: String): Unit = this.addDependency(new LauncherLibrary(library, url))
+  def dependency(library: LauncherLibrary) = this.dependencies.add(library)
+  def dependency(library: String): Unit = this.dependency(new LauncherLibrary(library))
+  def dependency(library: String, url: String): Unit = this.dependency(new LauncherLibrary(library, url))
+  def tweaker(tweaker: String): Unit = this.tweakers.add(tweaker)
+
   @inline def getFmlJson = this.fmlJson
   @inline def getDestination = this.destination
   @inline def setFmlJson(fmlJson: DelayedString) = this.fmlJson = fmlJson

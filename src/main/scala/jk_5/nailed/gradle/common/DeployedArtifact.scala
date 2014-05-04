@@ -14,7 +14,8 @@ case class DeployedArtifact(
   var load: Boolean = false,
   var coremod: String = null,
   var reobf: Boolean = false,
-  var restart: RestartLevel = RestartLevel.NOTHING
+  var restart: RestartLevel = RestartLevel.NOTHING,
+  var mclib: Boolean = false
 ) extends UpdaterArtifact
 case class MavenArtifact(
   var artifact: String = null,
@@ -25,6 +26,7 @@ case class MavenArtifact(
   var load: Boolean = false,
   var coremod: String = null,
   var reobf: Boolean = false,
-  var restart: RestartLevel = RestartLevel.NOTHING
+  var restart: RestartLevel = RestartLevel.NOTHING,
+  var mclib: Boolean = false
 ) extends UpdaterArtifact
 trait UpdaterArtifact

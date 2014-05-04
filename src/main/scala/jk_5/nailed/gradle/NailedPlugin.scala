@@ -19,14 +19,7 @@ import com.google.common.collect.ImmutableSet
 object Constants {
   final val NEWLINE = Properties.propOrElse("line.separator", "\n")
   final val NAILED_EXTENSION = "nailed"
-  final val NAILED_JSON = "{JSON_FILE}"
-  final val DEPENDENCY_CONFIG = "nailed"
   final val FML_JSON_URL = "https://raw.github.com/MinecraftForge/FML/master/jsons/{MC_VERSION}-rel.json"
-  final val MINECRAFT_URL = "https://s3.amazonaws.com/Minecraft.Download/versions/{MC_VERSION}/{MC_VERSION}.jar"
-  final val MINECRAFT_CACHE = "{CACHE_DIR}/{MC_VERSION}/minecraft-{MC_VERSION}.jar"
-  final val FORGE_URL = "http://files.minecraftforge.net/maven/net/minecraftforge/forge/{MC_VERSION}-{FORGE_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}-universal.jar"
-  final val FORGE_CACHE = "{CACHE_DIR}/{MC_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}.jar"
-  final val CLIENT_LOCATION = "{BUILD_DIR}/libs/Nailed-Client-{CLIENT_VERSION}.jar"
   final val PROFILE_LOCATION = "{CACHE_DIR}/{MC_VERSION}/launcherProfile.json"
   final val MINECRAFT_MAVEN = "https://libraries.mojang.com/"
   final val REMOTE_VERSION_FILE = "versions-2.json"
@@ -92,15 +85,19 @@ class NailedPlugin extends BasePlugin {
         task.setIsMod(p.mod)
         task.setLoad(p.load)
         task.setCoremod(p.coremod)
-        task.setDestination("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar")
-        task.setFinalizedBy(ImmutableSet.of("update" + p.projectName))
+        if(p.mclib){
+          task.setDestination("{MC_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar")
+        }else{
+          task.setDestination("{NAILED_LIB_DIR}/{ART_GROUP}/Nailed-{ART_NAME}/{ART_VERSION}/Nailed-{ART_NAME}-{ART_VERSION}.jar")
+        }
+        updateTask.setDependsOn(ImmutableSet.of("upload" + p.projectName))
         task.setUpdateTask(updateTask)
       case p: MavenArtifact =>
         val task = this.makeTask("update" + this.startUppercase(p.artifact), classOf[UpdateLibraryTask])
         if(p.localMavenPath == null){
-          task.setDestination("{MC_LIB_DIR}/" + this.parseMavenPath(p.mavenPath, classifier = false))
+          task.setDestination(if(p.mclib) "{MC_LIB_DIR}/" else "{NAILED_LIB_DIR}/" + this.parseMavenPath(p.mavenPath, classifier = false))
         }else{
-          task.setDestination("{MC_LIB_DIR}/" + this.parseMavenPath(p.localMavenPath, classifier = false))
+          task.setDestination(if(p.mclib) "{MC_LIB_DIR}/" else "{NAILED_LIB_DIR}/" + this.parseMavenPath(p.localMavenPath, classifier = false))
         }
         task.setLocation(p.mavenServer + this.parseMavenPath(p.mavenPath))
         task.setArtifact(p.artifact)
@@ -109,22 +106,6 @@ class NailedPlugin extends BasePlugin {
         task.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
         task.setLoad(p.load)
     }
-    /*val updateForgeTask = this.makeTask("updateForge", classOf[UpdateAdditionalLibraryTask])
-    updateForgeTask.setDestination("{MC_LIB_DIR}/net/minecraftforge/forge/{MC_VERSION}-{FORGE_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}.jar")
-    updateForgeTask.setLocation("http://files.minecraftforge.net/maven/net/minecraftforge/forge/{MC_VERSION}-{FORGE_VERSION}/forge-{MC_VERSION}-{FORGE_VERSION}-universal.jar")
-    updateForgeTask.setArtifact("forge")
-    updateForgeTask.setRestart(RestartLevel.NOTHING)
-    updateForgeTask.dependsOn("deployLauncherProfile")
-    updateForgeTask.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
-    updateForgeTask.setUpdateTask(this.updateLibraryListTask)
-
-    val updateMCTask = this.makeTask("updateMinecraft", classOf[UpdateAdditionalLibraryTask])
-    updateMCTask.setDestination("{MC_LIB_DIR}/net/minecraft/minecraft/{MC_VERSION}/minecraft-{MC_VERSION}.jar")
-    updateMCTask.setLocation(Constants.MINECRAFT_URL)
-    updateMCTask.setArtifact("minecraft")
-    updateMCTask.setRestart(RestartLevel.NOTHING)
-    updateMCTask.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
-    updateMCTask.setUpdateTask(this.updateLibraryListTask)*/
   }
 
   def parseMavenPath(in: String, classifier: Boolean = true): String = {
