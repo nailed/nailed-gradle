@@ -9,7 +9,6 @@ import jk_5.nailed.gradle.common.{SshUtils, SshConnectionPool}
 import jk_5.nailed.gradle.extension.NailedExtension
 import org.apache.tools.ant.filters.StringInputStream
 import jk_5.nailed.gradle.Constants
-import groovy.lang.Closure
 
 /**
  * No description given
@@ -20,10 +19,6 @@ class UpdateRemoteLibraryListTask extends DefaultTask {
 
   private var updated = mutable.ArrayBuffer[Library]()
   private var libraryList: LibraryList = _
-
-  this.onlyIf(new Closure[Boolean](this, this){
-    override def call(args: AnyRef*) = args(0).asInstanceOf[UpdateRemoteLibraryListTask].updated.size > 0
-  })
 
   @TaskAction def doTask(){
     val ext = NailedExtension.getInstance(this.getProject)

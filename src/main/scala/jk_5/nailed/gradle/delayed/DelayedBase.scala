@@ -15,10 +15,6 @@ object DelayedBase {
     var pattern = p
     project.getLogger.info("Resolving: " + pattern, null, null)
     if(p == null) return null
-    var build: String = "0"
-    if (System.getenv.containsKey("BUILD_NUMBER")) {
-      build = System.getenv("BUILD_NUMBER")
-    }
     val ext: NailedExtension = NailedExtension.getInstance(project)
     pattern = pattern.replace("{MC_VERSION}", ext.getMinecraftVersion)
     pattern = pattern.replace("{CACHE_DIR}", project.getGradle.getGradleUserHomeDir.getAbsolutePath.replace('\\', '/') + "/caches/nailed-forge")

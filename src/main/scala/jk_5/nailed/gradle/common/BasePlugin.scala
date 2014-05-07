@@ -1,7 +1,7 @@
 package jk_5.nailed.gradle.common
 
 import org.gradle.api.{Action, Plugin, Project}
-import jk_5.nailed.gradle.delayed.{DelayedFileTree, DelayedFile, DelayedString}
+import jk_5.nailed.gradle.delayed.{DelayedFile, DelayedString}
 import org.gradle.api.artifacts.repositories.{IvyArtifactRepository, MavenArtifactRepository}
 import java.util
 
@@ -63,6 +63,5 @@ trait BasePlugin extends Plugin[Project] {
   @inline implicit def stringToDelayedFile(input: String): DelayedFile = this.delayedFile(input)
   @inline protected def delayedString(path: String) = new DelayedString(project, path)
   @inline protected def delayedFile(path: String) = new DelayedFile(project, path)
-  @inline protected def delayedFileTree(path: String) = new DelayedFileTree(project, path)
   @inline protected def getProject = this.project
 }
