@@ -19,6 +19,7 @@ class UpdateRemoteLibraryListTask extends DefaultTask {
 
   private var updated = mutable.ArrayBuffer[Library]()
   private var libraryList: LibraryList = _
+  private var launcherProfileTask: CreateLauncherProfileTask = _
 
   @TaskAction def doTask(){
     val ext = NailedExtension.getInstance(this.getProject)
@@ -38,7 +39,7 @@ class UpdateRemoteLibraryListTask extends DefaultTask {
       }
     })
     this.libraryList.tweakers = ext.getTweakers
-    this.libraryList.versionName = ext.getVersionName
+    this.libraryList.versionName = this.launcherProfileTask.getVersionName
     val sftp = SshConnectionPool.getConnection(this.getProject)
     SshUtils.cd(sftp, ext.getRemoteProfileDir)
     sftp.put(new StringInputStream(Serialization.gson.toJson(this.libraryList)), Constants.REMOTE_VERSION_FILE)
@@ -47,4 +48,7 @@ class UpdateRemoteLibraryListTask extends DefaultTask {
 
   def updateLibrary(library: Library) = this.updated += library
   def setLibraryList(libraryList: LibraryList) = this.libraryList = libraryList
+  def setLauncherProfileTask(task: CreateLauncherProfileTask) = this.launcherProfileTask = task
+  def getLibraries = this.libraryList.libraries
+  def getUpdated = this.updated
 }

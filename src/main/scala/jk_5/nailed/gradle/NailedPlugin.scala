@@ -63,6 +63,11 @@ class NailedPlugin extends BasePlugin {
     updateTask.setFinalizedBy(ImmutableSet.of("updateLibraryList"))
     updateTask.setUpdateTask(this.updateLibraryListTask)
     uploadProfileTask.setUpdateTask(updateTask)
+    this.updateLibraryListTask.setLauncherProfileTask(launcherProfileTask)
+
+    val notificationTask = this.makeTask("notification", classOf[UpdateNotificationTask])
+    notificationTask.setUpdateTask(this.updateLibraryListTask)
+    this.updateLibraryListTask.setFinalizedBy(ImmutableSet.of("notification"))
   }
 
   override def afterEvaluate(){

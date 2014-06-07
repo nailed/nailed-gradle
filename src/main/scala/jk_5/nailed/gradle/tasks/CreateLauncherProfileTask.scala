@@ -2,7 +2,6 @@ package jk_5.nailed.gradle.tasks
 
 import org.gradle.api.DefaultTask
 import jk_5.nailed.gradle.delayed.{DelayedBase, DelayedFile, DelayedString}
-import jk_5.nailed.gradle.extension.NailedExtension
 import java.net.URL
 import jk_5.nailed.gradle.Constants
 import java.io.{FileWriter, InputStreamReader}
@@ -22,11 +21,12 @@ class CreateLauncherProfileTask extends DefaultTask {
 
   private var fmlJson: DelayedString = null
   private var destination: DelayedFile = null
+  private var versionName: String = null
+  private var mainClass: String = null
   private val dependencies = new util.ArrayList[LauncherLibrary]
   private val tweakers = new util.ArrayList[String]
 
   @TaskAction def doTask(){
-    val ext = NailedExtension.getInstance(getProject)
     val url = new URL(new DelayedString(this.getProject, Constants.FML_JSON_URL).call)
     val conn = url.openConnection
     conn.setConnectTimeout(5000)
@@ -51,13 +51,13 @@ class CreateLauncherProfileTask extends DefaultTask {
     val argsBuilder = new StringBuilder(fmlProfile.minecraftArguments.split(" --tweakClass ", 2)(0))
     this.tweakers.foreach(t => argsBuilder.append(" --tweakClass ").append(t))
 
-    newProfile.id = ext.getVersionName
-    newProfile.mainClass = ext.getMainClass
+    newProfile.id = this.versionName
+    newProfile.mainClass = this.mainClass
     newProfile.minimumLauncherVersion = fmlProfile.minimumLauncherVersion
     newProfile.incompatibilityReason = fmlProfile.incompatibilityReason
     newProfile.typ = "release"
     newProfile.time = new Date
-    newProfile.releaseTime = new Date
+    newProfile.releaseTime = fmlProfile.releaseTime
     newProfile.sync = false
     newProfile.minecraftArguments = argsBuilder.toString()
 
@@ -71,6 +71,11 @@ class CreateLauncherProfileTask extends DefaultTask {
   def dependency(library: String): Unit = this.dependency(new LauncherLibrary(library))
   def dependency(library: String, url: String): Unit = this.dependency(new LauncherLibrary(library, url))
   def tweaker(tweaker: String): Unit = this.tweakers.add(tweaker)
+
+  def setVersionName(versionName: String) = this.versionName = versionName
+  def getVersionName: String = this.versionName
+  def setMainClass(mainClass: String) = this.mainClass = mainClass
+  def getMainClass: String = this.mainClass
 
   @inline def getFmlJson = this.fmlJson
   @inline def getDestination = this.destination

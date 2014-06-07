@@ -17,9 +17,7 @@ object NailedExtension {
 class NailedExtension(val project: Project) {
 
   private var minecraftVersion: String = null
-  private var versionName: String = "Nailed"
   private var loadingMavenUrl: String = "http://maven.reening.nl/"
-  private var mainClass: String = null
   private var deployHost: String = null
   private var deployUsername: String = null
   private var deployPassword: String = null
@@ -28,9 +26,7 @@ class NailedExtension(val project: Project) {
   private val deployed = new util.ArrayList[UpdaterArtifact]
 
   @inline def getMinecraftVersion = this.minecraftVersion
-  @inline def getVersionName = this.versionName
   @inline def getLoadingMavenUrl = this.loadingMavenUrl
-  @inline def getMainClass = this.mainClass
   @inline def getDeployHost = this.deployHost
   @inline def getDeployUsername = this.deployUsername
   @inline def getDeployPassword = this.deployPassword
@@ -39,9 +35,7 @@ class NailedExtension(val project: Project) {
   @inline def getDeployed = this.deployed
 
   @inline def setMinecraftVersion(minecraftVersion: String) = this.minecraftVersion = minecraftVersion
-  @inline def setVersionName(versionName: String) = this.versionName = versionName
   @inline def setLoadingMavenUrl(loadingMavenUrl: String) = this.loadingMavenUrl = loadingMavenUrl
-  @inline def setMainClass(mainClass: String) = this.mainClass = mainClass
   @inline def setDeployHost(deployHost: String) = this.deployHost = deployHost
   @inline def setDeployUsername(deployUsername: String) = this.deployUsername = deployUsername
   @inline def setDeployPassword(deployPassword: String) = this.deployPassword = deployPassword
